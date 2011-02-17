@@ -55,15 +55,15 @@ public:
     bool alldiff_constraints();
 
     //
-    void feed(int a, value v);
-    void discard(int a, value v);
+    void feed(coord a, value v);
+    void discard(coord a, value v);
     
     
 	///
 
 	bool dirty() const { return dirty_; }
 
-	int unsolved() const { return unsolved_; }
+	coord unsolved() const { return unsolved_; }
 	bool solved() const { return unsolved() == 0; }
 
 	bool error() const { return error_; }
@@ -83,19 +83,19 @@ public:
 
 	///
 
-    bool ok(int a) const                { return cells_[a] != state_error && (!solved(a) || possible(a, solution(a))); }
-	bool solved(int a) const            { return cells_[a] > 0; }
+    bool ok(coord a) const                { return cells_[a] != state_error && (!solved(a) || possible(a, solution(a))); }
+	bool solved(coord a) const            { return cells_[a] > 0; }
     
     bool* gourmets(value v)             { return values_ + (v-1) * area(); }
     const bool* gourmets(value v) const { return values_ + (v-1) * area(); }
-    bool possible(int a, value v) const { return gourmets(v)[a]; }
+    bool possible(coord a, value v) const { return gourmets(v)[a]; }
 
-	value solution(int a) const         { return cells_[a]; }
+	value solution(coord a) const         { return cells_[a]; }
 
 
-    int repertoire(int a) const         { return cells_[a] > 0 ? 1 : -cells_[a]; }
-    void repertoire(int a, field& v) const;
-    int repertoire(int a, int i) const;
+    coord repertoire(coord a) const         { return cells_[a] > 0 ? 1 : -cells_[a]; }
+    void repertoire(coord a, field& v) const;
+    value repertoire(coord a, coord i) const;
 
 
     bool early() const                  { return error() && immediate_; }
@@ -105,11 +105,11 @@ protected:
 
 	/// members
 
-	signed char * cells_;
+    value* cells_;
 	bool * values_;
     
     bool error_, dirty_, smart_,clever_;
-	int unsolved_;
+	coord unsolved_;
 
 	bool toohard_, unique_, hassolution_, multiple_, immediate_;
 	int depth_, difficulty_;

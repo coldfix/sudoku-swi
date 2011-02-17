@@ -75,7 +75,7 @@ void Solver::set(const Size& size)
 
 	if (initialized()){
 		if (realloc) {
-			cells_ = new signed char[area()];
+			cells_ = new value[area()];
 			values_ = new bool[line() * area()];
         }
         //std::memset(values_, (char) 1, line() * area());
@@ -95,7 +95,7 @@ void Solver::set(const Sudoku& sudoku)
 {
 	set(sudoku.size());
 
-	for (int a = 0; a < area(); a++)
+	for (coord a = 0; a < area(); a++)
 		if (sudoku.get(a))
 			feed(a, sudoku.get(a));
 }
@@ -109,24 +109,24 @@ void Solver::set(const Sudoku& sudoku)
 Sudoku Solver::get() const
 {
 	Sudoku sudoku((const Size&)*this);
-	for (int a = 0; a < area(); a++)
+	for (coord a = 0; a < area(); a++)
 		if (solved(a))
 			sudoku.set(a, solution(a));
 	return sudoku;
 }
 
-void Solver::repertoire(int a, field& va) const
+void Solver::repertoire(coord a, field& va) const
 {
 	va.clear();
 	va.reserve(line());
-	for (value v = 1; v <= line(); v++)
+	for (value v = min_value(); v <= max_value(); v++)
 		if (possible(a, v))
 			va.push_back(v);
 }
 
-int Solver::repertoire(int a, int i) const
+value Solver::repertoire(coord a, coord i) const
 {
-	for (value v = 1; v <= line(); v++)
+	for (value v = min_value(); v <= max_value(); v++)
         if (possible(a, v) && ! i--)
 			return v;
 	return 0;
@@ -136,9 +136,10 @@ int Solver::repertoire(int a, int i) const
 
 
 /*
+ * Set a cell to a specified value
 */
 
-void Solver::feed(int a, value val)
+void Solver::feed(coord a, value val)
 {
 	if (solved(a))
 		return;
@@ -146,64 +147,33 @@ void Solver::feed(int a, value val)
 	dirty_ = true;
 
 	cells_[a] = val;								// update field info
-	for (value v = 1; v <= line(); v++)
+	for (value v = min_value(); v <= max_value(); v++)
 		if (v != val)
 			gourmets(v)[a] = false;
 
     bool * vpossible = gourmets(val);
 	if (!vpossible[a])
 		error_ = true;
-
 	if (early())
 		return;
 
+	coord y = y_a(a),
+          x = x_a(a),
+          b = b_xy(x,y),
+          f = f_xy(x,y);
 
-	int y = y_a(a),
-		x = x_a(a);
-	int b = b_xy(x,y),
-		f = f_xy(x,y);
-
-    for (int u = 0; u < line(); ++u) {
-		if (vpossible[a_xy(u, y)] && u != x)
-			discard(a_xy(u, y), val);
-		if (vpossible[a_xy(x, u)] && u != y)
-			discard(a_xy(x, u), val);
-		if (vpossible[a_bf(b, u)] && u != f)
-			discard(a_bf(b, u), val);
+    // constraint forwarding..
+    for (coord u = 0; u < line(); ++u) {
+		if (vpossible[a_xy(u, y)] && u != x) discard(a_xy(u, y), val);
+		if (vpossible[a_xy(x, u)] && u != y) discard(a_xy(x, u), val);
+		if (vpossible[a_bf(b, u)] && u != f) discard(a_bf(b, u), val);
         if (early())
             return;
     }
-
-	//--------------------------------------------------
-	// for (int xi = 0; xi < line(); xi++) {				// walk row
-	// 	if (vpossible[a_xy(xi, y)] && xi != x){
-	// 		discard(a_xy(xi, y), val);
-	// 		if (early())
-	// 			return;
-    //     }
-    // }
-    // 
-	// for (int yi = 0; yi < line(); yi++) {				// walk col
-	// 	if (vpossible[a_xy(x, yi)] && yi != y){
-	// 		discard(a_xy(x,yi), val);
-	// 		if (early())
-	// 			return;
-    //     }
-    // }
-    // 
-    // 
-	// for (int fi = 0; fi < line(); fi++) {				// walk box
-	// 	if (vpossible[a_bf(b, fi)] && fi != f){
-	// 		discard(a_bf(b, fi), val);
-	// 		if (early())
-	// 			return;
-    //     }
-    // }
-	//-------------------------------------------------- 
 }
 
 
-void Solver::discard(int a, value val)
+void Solver::discard(coord a, value val)
 {
 	if (!possible(a,val))
 		return;
@@ -217,11 +187,10 @@ void Solver::discard(int a, value val)
 	if (solved(a))              // return if cell had already been solved..
 		return;
 
-	++ cells_[a];
-    if (repertoire(a) == 1) {   // just solved the cell? so lets go and publish the new value!
-		for (value v = 1; v <= line(); v++) {
+    if (++cells_[a] == -1) {    // just solved the cell? so lets go and publish the new value!
+		for (value v = min_value(); v <= max_value(); v++) {
 			if (possible(a, v)) {
-				feed(a,v);
+				feed(a, v);
 				break;
             }
         }
@@ -257,19 +226,19 @@ void Solver::deepthoughts(bool smart, bool clever, bool test_alldiff)
 void Solver::thinksmart()
 {
     smart_ = true;
-	for (int a = 0; a < area() && !dirty(); a++) {			// search for unique values
+	for (coord a = 0; a < area() && !dirty(); a++) {			// search for unique values
 		if (solved(a))
 			continue;
-		int x = x_a(a), y = y_a(a),
-			b = b_a(a), f = f_a(a);
+		coord x = x_a(a), y = y_a(a),
+              b = b_a(a), f = f_a(a);
 
-		for (value v = 1; v <= line(); v++) {
+		for (value v = min_value(); v <= max_value(); v++) {
             bool* possible = gourmets(v);
 			if (!possible[a])
 				continue;
 
 			bool solve = true;
-			for (int xi = 0; xi < line(); xi++)				// in one row
+			for (coord xi = 0; xi < line(); xi++)				// in one row
 				if (possible[a_xy(xi, y)] && xi != x) {
 					solve = false;
 					break; }
@@ -278,7 +247,7 @@ void Solver::thinksmart()
 				break; }
 
 			solve = true;
-			for (int yi = 0; yi < line(); yi++)				// in one column
+			for (coord yi = 0; yi < line(); yi++)				// in one column
 				if (possible[a_xy(x, yi)] && yi != y) {
 					solve = false;
 					break; }
@@ -287,7 +256,7 @@ void Solver::thinksmart()
 				break; }
 
 			solve = true;
-			for (int fi = 0; fi < line(); fi++)				// in one box
+			for (coord fi = 0; fi < line(); fi++)				// in one box
 				if (possible[a_bf(b, fi)] && fi != f) {
 					solve = false;
 					break; }
@@ -316,28 +285,28 @@ void Solver::thinksmart()
 void Solver::thinkclever()
 {
     clever_ = true;
-	for (value v = 1; v <= line(); v++) {		//search vals that are possible in only
+	for (value v = min_value(); v <= max_value(); v++) {		//search vals that are possible in only
         bool *possible = gourmets(v);
 
-		for (int x = 0; x < line(); x++) {			// one box's col within a col
+		for (coord x = 0; x < line(); x++) {			// one box's col within a col
 			bool operate = false;
-			int yb;
-			for (int y = 0; y < line(); y++)
+			coord yb;
+			for (coord y = 0; y < line(); y++)
 				if (possible[a_xy(x,y)]) {
 					operate = !solved(a_xy(x,y));
 					yb = yb_y(y);
 					break; }
 			if (!operate)
 				continue;
-			for (int y = y_hl(yb+1, 0); y < line(); y++)
+			for (coord y = y_hl(yb+1, 0); y < line(); y++)
 				if (possible[a_xy(x, y)]) {
 					operate = false;
 					break; }
 			if (!operate)
 				continue;
-			int b = b_hl(xb_x(x), yb),				// and remove this possibility from the rest of the box
+			coord b = b_hl(xb_x(x), yb),				// and remove this possibility from the rest of the box
 				xf = xf_x(x);
-			for (int f = 0; f < line(); f++)
+			for (coord f = 0; f < line(); f++)
 				if (xf_f(f) != xf && possible[a_bf(b,f)]) {
 					discard(a_bf(b,f), v);
 					dirty_ = true; }
@@ -345,25 +314,25 @@ void Solver::thinkclever()
 				return;
 		}
 
-		for (int y = 0; y < line(); y++) {			// in one box's row of a row
+		for (coord y = 0; y < line(); y++) {			// in one box's row of a row
 			bool operate = false;
-			int xb;
-			for (int x = 0; x < line(); x++)
+			coord xb;
+			for (coord x = 0; x < line(); x++)
 				if (possible[a_xy(x,y)]) {
 					operate = !solved(a_xy(x,y));
 					xb = xb_x(x);
 					break; }
 			if (!operate)
 				continue;
-			for (int x = x_hl(xb+1, 0); x < line(); x++)
+			for (coord x = x_hl(xb+1, 0); x < line(); x++)
 				if (possible[a_xy(x,y)]) {
 					operate = false;
 					break; }
 			if (!operate)
 				continue;
-			int b = b_hl(xb, yb_y(y)),				// and remove this possibility from the rest of the box
+			coord b = b_hl(xb, yb_y(y)),				// and remove this possibility from the rest of the box
 				yf = yf_y(y);
-			for (int f = 0; f < line(); f++)
+			for (coord f = 0; f < line(); f++)
 				if (yf_f(f) != yf && possible[a_bf(b,f)]) {
 					discard(a_bf(b,f), v);
 					dirty_ = true; }
@@ -371,25 +340,25 @@ void Solver::thinkclever()
 				return;
 		}
 
-		for (int b = 0; b < line(); b++){			// in one col of a box
+		for (coord b = 0; b < line(); b++){			// in one col of a box
 			bool operate = false;
-			int xf;
-			for (int f = 0; f < line(); f++)
+			coord xf;
+			for (coord f = 0; f < line(); f++)
 				if (possible[a_bf(b, f)]) {
 					operate = !solved(a_bf(b, f));
 					xf = xf_f(f);
 					break; }
 			if (!operate)
 				continue;
-			for (int f = f_hl(xf+1, 0); f < line(); f++)
+			for (coord f = f_hl(xf+1, 0); f < line(); f++)
 				if (possible[a_bf(b, f)]) {
 					operate = false;
 					break; }
 			if (!operate)
 				continue;
-			int x=x_hl(xb_b(b),xf),					// and remove these vals in the rest of the col
+			coord x=x_hl(xb_b(b),xf),					// and remove these vals in the rest of the col
 				yb=yb_b(b);
-			for (int y = 0; y < line(); y++)
+			for (coord y = 0; y < line(); y++)
 				if (yb_y(y) != yb && possible[a_xy(x,y)]) {
 					discard(a_xy(x,y), v);
 					dirty_ = true; }
@@ -397,25 +366,25 @@ void Solver::thinkclever()
 				return;
 		}
 
-		for (int b = 0; b < line(); b++) {			// in one row of a box
+		for (coord b = 0; b < line(); b++) {			// in one row of a box
 			bool operate = false;
-			int yf;
-			for (int f = 0; f < line(); f++)
+			coord yf;
+			for (coord f = 0; f < line(); f++)
 				if (possible[a_bf(b, f)]) {
 					operate = !solved(a_bf(b, f));
 					yf = yf_f(f);
 					break; }
 			if (!operate)
 				continue;
-			for (int f = f_hl(0, yf+1); f < line(); f++)
+			for (coord f = f_hl(0, yf+1); f < line(); f++)
 				if (possible[a_bf(b,f)] && yf_f(f) != yf) {
 					operate = false;
 					break; }
 			if (!operate)
 				continue;
-			int y = y_hl(yb_b(b), yf),				// and remove these vals in the rest of the row
+			coord y = y_hl(yb_b(b), yf),				// and remove these vals in the rest of the row
 				xb = xb_b(b);
-			for (int x = 0; x < line(); x++)
+			for (coord x = 0; x < line(); x++)
 				if (xb_x(x) != xb && possible[a_xy(x,y)]) {
 					discard(a_xy(x,y), v);
 					dirty_ = true; }
@@ -436,9 +405,9 @@ bool Solver::alldiff_constraints()
         row_values(num_values(), false),
         col_values(num_values(), false),
         block_values(num_values(), false);
-    for (int u = 0; u < line(); ++u) {
+    for (coord u = 0; u < line(); ++u) {
         // to do: speed this up by looking at cells first which allow all values (?)
-        for (int w = 0; w < line(); ++w) {
+        for (coord w = 0; w < line(); ++w) {
             for (value v = min_value(); v <= max_value(); ++v) {
                 if (possible(a_xy(w, u), v)) row_values[v - 1] = true;
                 if (possible(a_xy(u, w), v)) col_values[v - 1] = true;
@@ -476,8 +445,8 @@ void Solver::test(int max_depth)
 
 
 struct L {
-    L (int _a) : a(_a)  {}
-    int a;
+    L (coord _a) : a(_a)  {}
+    coord a;
     field values;
 };
     
@@ -511,9 +480,9 @@ void Solver::solve(int max_depth, int method, int max_backtrack)
             }
             // apply MRV heuristic:
             // (to do: gradheuristic [waehle zelle,wert mit groesstem verzweigungsgrad])
-			int a = 0,
+			coord a = 0,
                 cardinality = line() + 1;
-			for (int ai = 0; ai < area(); ai++)
+			for (coord ai = 0; ai < area(); ai++)
                 if (!solved(ai) && repertoire(ai) < cardinality) {  // currently : select cell with smallest repertoire ..(?)
 					a = ai;
                     cardinality = repertoire(a); }
@@ -542,7 +511,7 @@ void Solver::solve(int max_depth, int method, int max_backtrack)
 		} else {
             // to do: heuristik des geringst einschraenkenden wertes
 			int iv = l.values.size()-1;
-			int v = l.values[iv];
+			value v = l.values[iv];
 			l.values.erase(l.values.begin() + iv);
 			feed(l.a, v);
 			// deepthoughts(smart, clever, method == method_findany);

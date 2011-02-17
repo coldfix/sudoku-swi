@@ -1,19 +1,20 @@
 #ifndef __SUDOKU_H__INCLUDED__
 #define __SUDOKU_H__INCLUDED__
 
+#include <boost/cstdint.hpp>
+
 
 namespace sudoku
 {
 
-    typedef int coord;
-    typedef unsigned char value;
-    
+    typedef boost::int16_t coord;
+    typedef boost::int8_t value;
+
     enum {
         difficulty_easy,
         difficulty_medium,
         difficulty_hard
     };
-    
 
 
 /*
@@ -25,11 +26,11 @@ namespace sudoku
 class Size
 {
 public:
-	Size()					    { set(0,0); }
-	Size(int bx, int by)		{ set(bx,by); }
-	Size(const Size& s)		    { set(s.bx(),s.by()); }
+	Size() : nbx(), nby(), row(), total() { }
+	Size(coord bx, coord by)		{ set(bx,by); }
+	// Size(const Size& s) = default;
 
-    void set(int _nbx, int _nby)
+    void set(coord _nbx, coord _nby)
     {
         nbx = _nbx;
         nby = _nby;
@@ -39,19 +40,19 @@ public:
 
 	/// size
 
-	int bx() const					{ return nbx; }
-	int by() const					{ return nby; }
-	int fx() const					{ return nby; }
-	int fy() const					{ return nbx; }
+	coord bx() const					{ return nbx; }
+	coord by() const					{ return nby; }
+	coord fx() const					{ return nby; }
+	coord fy() const					{ return nbx; }
     
-	int line() const				{ return row; }
-	int area() const				{ return total; }
+	coord line() const				{ return row; }
+	coord area() const				{ return total; }
 
 	bool initialized() const		{ return bx() && by(); }
 
-	int max_value() const			{ return row; }
-	int min_value() const			{ return 1; }
-    int num_values() const          { return row; }
+	value max_value() const			{ return row; }
+	value min_value() const			{ return 1; }
+    coord num_values() const          { return row; }
 
 	bool operator  == (const Size& ds) const
     {
@@ -65,44 +66,44 @@ public:
 
 	/// coord transformations
 
-	int a_xy(int x,int y) const		{ return x * line() + y; }
-	int a_bf(int b,int f) const		{ return a_xy(x_bf(b,f), y_bf(b,f)); }
+	coord a_xy(coord x,coord y) const		{ return x * line() + y; }
+	coord a_bf(coord b,coord f) const		{ return a_xy(x_bf(b,f), y_bf(b,f)); }
 
-	int x_a(int a) const			{ return a / line(); }
-	int y_a(int a) const			{ return a % line(); }
-	int b_a(int a) const			{ return b_hl(xb_a(a), yb_a(a)); }
-	int f_a(int a) const			{ return f_hl(xf_a(a), yf_a(a)); }
+	coord x_a(coord a) const			{ return a / line(); }
+	coord y_a(coord a) const			{ return a % line(); }
+	coord b_a(coord a) const			{ return b_hl(xb_a(a), yb_a(a)); }
+	coord f_a(coord a) const			{ return f_hl(xf_a(a), yf_a(a)); }
 
-	int x_bf(int b,int f) const		{ return x_hl(xb_b(b), xf_f(f)); }
-	int y_bf(int b,int f) const		{ return y_hl(yb_b(b), yf_f(f)); }
-	int b_xy(int x,int y) const		{ return b_hl(xb_x(x), yb_y(y)); }
-	int f_xy(int x,int y) const		{ return f_hl(xf_x(x), yf_y(y)); }
+	coord x_bf(coord b,coord f) const		{ return x_hl(xb_b(b), xf_f(f)); }
+	coord y_bf(coord b,coord f) const		{ return y_hl(yb_b(b), yf_f(f)); }
+	coord b_xy(coord x,coord y) const		{ return b_hl(xb_x(x), yb_y(y)); }
+	coord f_xy(coord x,coord y) const		{ return f_hl(xf_x(x), yf_y(y)); }
 
-	int x_hl(int h,int l) const		{ return h * fx() + l; }
-	int y_hl(int h,int l) const		{ return h * fy() + l; }
-	int b_hl(int h,int l) const		{ return h * by() + l; }
-	int f_hl(int h,int l) const		{ return h * fy() + l; }
+	coord x_hl(coord h,coord l) const		{ return h * fx() + l; }
+	coord y_hl(coord h,coord l) const		{ return h * fy() + l; }
+	coord b_hl(coord h,coord l) const		{ return h * by() + l; }
+	coord f_hl(coord h,coord l) const		{ return h * fy() + l; }
 
-	int xb_x(int x) const			{ return x / fx(); }
-	int xf_x(int x) const			{ return x % fx(); }
-	int yb_y(int y) const			{ return y / fy(); }
-	int yf_y(int y) const			{ return y % fy(); }
+	coord xb_x(coord x) const			{ return x / fx(); }
+	coord xf_x(coord x) const			{ return x % fx(); }
+	coord yb_y(coord y) const			{ return y / fy(); }
+	coord yf_y(coord y) const			{ return y % fy(); }
 
-	int xb_b(int b) const			{ return b / by(); }
-	int xf_f(int f) const			{ return f / fy(); }
-	int yb_b(int b) const			{ return b % by(); }
-	int yf_f(int f) const			{ return f % fy(); }
+	coord xb_b(coord b) const			{ return b / by(); }
+	coord xf_f(coord f) const			{ return f / fy(); }
+	coord yb_b(coord b) const			{ return b % by(); }
+	coord yf_f(coord f) const			{ return f % fy(); }
 
-	int xb_a(int a) const			{ return xb_x(x_a(a)); }
-	int xf_a(int a) const			{ return xf_x(x_a(a)); }
-	int yb_a(int a) const			{ return yb_y(y_a(a)); }
-	int yf_a(int a) const			{ return yf_y(y_a(a)); }
+	coord xb_a(coord a) const			{ return xb_x(x_a(a)); }
+	coord xf_a(coord a) const			{ return xf_x(x_a(a)); }
+	coord yb_a(coord a) const			{ return yb_y(y_a(a)); }
+	coord yf_a(coord a) const			{ return yf_y(y_a(a)); }
 
 protected:
 
 	/// members
 
-	int nbx, nby, row, total;
+	coord nbx, nby, row, total;
 };
 
 
@@ -160,13 +161,13 @@ protected:
 		data_ = alloc(size().area());
 
 		if (copy && data_ && old) {
-			for (int i = 0; i < size().area(); i++)
+			for (coord i = 0; i < size().area(); i++)
 				data_[i] = old[i];
 		}
 		free(old);
 	}
 
-	static value* alloc(int size)
+	static value* alloc(coord size)
 	{
 		if (size == 0)
 			return 0;
@@ -196,12 +197,12 @@ public:
         unsolved_ = _size.area();
         
         if (_data) {
-            for (int a = 0; a < size().area(); a++)
+            for (coord a = 0; a < size().area(); a++)
                 if ((data_[a] = _data[a]))
                     --unsolved_;
         }
         else {
-            for (int a = 0; a < size().area(); a++)
+            for (coord a = 0; a < size().area(); a++)
                 data_[a] = 0;
         }
     }
@@ -225,8 +226,8 @@ public:
 
 	/// test
 
-	int unsolved() const { return unsolved_; }
-	int solved() const { return size().area() - unsolved(); }
+	coord unsolved() const { return unsolved_; }
+	coord solved() const { return size().area() - unsolved(); }
 	bool empty() const { return solved() == 0; }
 	bool filled() const { return unsolved() == 0; }
 	bool is_solved() const { return filled() && valid(); }
@@ -235,7 +236,7 @@ public:
     {
 		if (size() != sudoku.size())
 			return false;
-		for (int a = 0; a < size().area(); a++)
+		for (coord a = 0; a < size().area(); a++)
 			if (get(a) != sudoku.get(a))
 				return false;
 		return true;
@@ -253,20 +254,20 @@ public:
 
 	bool valid() const
 	{
-		for (int a = 0; a < size().area(); a++)
+		for (coord a = 0; a < size().area(); a++)
 		{
-            int x = size().x_a(a), y = size().y_a(a),
+            coord x = size().x_a(a), y = size().y_a(a),
                 b = size().b_a(a), f = size().f_a(a),
 				v = get(a);
 			if (!v)
 				continue;
-            for (int xi = x + 1; xi < size().line(); xi++)
+            for (coord xi = x + 1; xi < size().line(); xi++)
                 if (get(size().a_xy(xi, y)) == v)
 					return false;
-            for (int yi = y + 1; yi < size().line(); yi++)
+            for (coord yi = y + 1; yi < size().line(); yi++)
                 if (get(size().a_xy(x, yi)) == v)
 					return false;
-            for (int fi = f + 1; fi < size().line(); fi++)
+            for (coord fi = f + 1; fi < size().line(); fi++)
                 if (get(size().a_bf(b, fi)) == v)
 					return false;
 		}
@@ -276,23 +277,23 @@ public:
 
 	/// coord-access
 
-	value get(int a) const
+	value get(coord a) const
     {
 		return data_[a];
     }
 
-	value get(int x, int y) const
+	value get(coord x, coord y) const
     {
 		return get(size().a_xy(x,y));
     }
 
-	value operator [] (int a) const
+	value operator [] (coord a) const
     {
 		return get(a);
     }
 
 
-	void set(int a, value num)
+	void set(coord a, value num)
 	{
 		if (shared())
             unshare();
@@ -303,7 +304,7 @@ public:
 		data_[a] = num;
 	}
 
-	void set(int x, int y, value num)
+	void set(coord x, coord y, value num)
     {
         set(size().a_xy(x,y), num);
     }
@@ -312,7 +313,7 @@ public:
 private:
 	/// members
 	value* data_;
-	int unsolved_;
+	coord unsolved_;
     Size size_;
 };
 

@@ -28,18 +28,19 @@ template<class T>
 T remove_random(std::vector<T>& v)
 {
 	int i = getrand(v.size());
-	int elem = v[i];
+	T elem = v[i];
 	std::swap(v[i], v[v.size()-1]);
 	v.pop_back();
 	return elem;
 }
 
+template <class T>
 class IntSequence {
-	int counter;
+	T counter;
 public:
-	IntSequence (int start = 0) : counter(start) { }
+	IntSequence (T start = T()) : counter(start) { }
 
-	int operator() () {
+	T operator() () {
 		return counter++; }
 };
 
@@ -163,15 +164,15 @@ bool Generator::obfuscate(int difficulty, int min_fill, int max_fill, int max_de
 	Solver solve(size);
 	Sudoku riddle(size);
 
-	std::vector<int> as(size.area());
-	std::generate(as.begin(), as.end(), IntSequence(0));
+	std::vector<coord> as(size.area());
+	std::generate(as.begin(), as.end(), IntSequence<coord>(0));
 
 	while (!solve.solved() || riddle.solved() < min_fill)	// offene felder auswuerfeln
 	{
 		if (!as.size())
 			break;
 
-		int a = remove_random(as);
+		coord a = remove_random(as);
 		if (solve.solved(a) || !sudoku[a])
 			continue;
 
@@ -186,13 +187,13 @@ bool Generator::obfuscate(int difficulty, int min_fill, int max_fill, int max_de
 	{
 		as.clear();
 		as.reserve(riddle.solved());
-        for (int a = 0; a < size.area(); a++)
+        for (coord a = 0; a < size.area(); a++)
 			if (riddle[a])
 				as.push_back(a);
 
 		while (as.size() && riddle.solved() > min_fill)
 		{
-			int a = remove_random(as);
+			coord a = remove_random(as);
 			riddle.set(a, 0);
 			solve.set(riddle);
 			solve.test(max_depth);
@@ -226,18 +227,18 @@ bool Generator::fill(int max_backtrack)
     do {
         solve.set(m_sudoku);
         if (empty) {
-            for (int f = 0; f < size.line(); f++) {				// fill 1st block
+            for (coord f = 0; f < size.line(); f++) {				// fill 1st block
                 if (solve.error())                                  // this should be impossible
                     return false;
 
-                int a = size.a_bf(0, f);
+                coord a = size.a_bf(0, f);
                 int iv = getrand(solve.repertoire(a));
                 solve.feed(a, solve.repertoire(a, iv));
             }
 
-        //	for (int y=solve.fy(); y < solve.line(); y++)				// fill 1st column
+        //	for (coord y=solve.fy(); y < solve.line(); y++)				// fill 1st column
         //	{
-        //		int a = solve.a_xy(0,y);
+        //		coord a = solve.a_xy(0,y);
         //		int iv = getrand(solve.possibilities(a));
         //		solve.setsolution(a, solve.possibility(a, iv));
         //	}
