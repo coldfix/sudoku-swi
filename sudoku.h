@@ -51,6 +51,7 @@ public:
 
 	int max_value() const			{ return row; }
 	int min_value() const			{ return 1; }
+    int num_values() const          { return row; }
 
 	bool operator  == (const Size& ds) const
     {
@@ -181,7 +182,7 @@ protected:
 	}
 	void ref(value * data)
 	{
-        if (data_ = data)
+        if ((data_ = data))
 		    ++data_[-1];
 	}
 public:
@@ -196,7 +197,7 @@ public:
         
         if (_data) {
             for (int a = 0; a < size().area(); a++)
-                if (data_[a] = _data[a])
+                if ((data_[a] = _data[a]))
                     --unsolved_;
         }
         else {

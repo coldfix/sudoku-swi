@@ -1,10 +1,37 @@
+// #include <cstring>		// memcpy, memset
+
+#include <algorithm>    // fill_n
+#include <vector>
+#include <functional>
 #include "solver.h"
-#include <cstring>		// memcpy, memset
+
+
+// to do:
+// > update queue [ring buffer] (to avoid multiple updating)
+// > conflict domain (to improve backtracking)
+
+
+namespace std
+{
+    //--------------------------------------------------
+    // template <class T>
+    //     bool equal_to(const T& a, const T& b) {
+    //         return a == b;
+    //     }
+    //-------------------------------------------------- 
+    template <class I, class P>
+        bool any_of(I begin, I end, P pred) {
+            return find_if(begin, end, pred) != end;
+        }
+    template <class C, class P>
+        bool any_of(C container, P pred) {
+            return any_of(container.begin(), container.end(), pred);
+        }
+}
+
 
 namespace sudoku
 {
-
-
 
 /*
 */
@@ -51,8 +78,10 @@ void Solver::set(const Size& size)
 			cells_ = new signed char[area()];
 			values_ = new bool[line() * area()];
         }
-        std::memset(values_, 1, line() * area());
-        std::memset(cells_, (char) -line(), area());
+        //std::memset(values_, (char) 1, line() * area());
+        //std::memset(cells_, (char) -line(), area());
+        std::fill_n(values_, line() * area(), true);
+        std::fill_n(cells_, area(), (char) -line());
 	}
 
 	error_ = !initialized();
@@ -98,7 +127,7 @@ void Solver::repertoire(int a, field& va) const
 int Solver::repertoire(int a, int i) const
 {
 	for (value v = 1; v <= line(); v++)
-		if (possible(a, v) && ! i--)
+        if (possible(a, v) && ! i--)
 			return v;
 	return 0;
 }
@@ -108,7 +137,6 @@ int Solver::repertoire(int a, int i) const
 
 /*
 */
-
 
 void Solver::feed(int a, value val)
 {
@@ -132,33 +160,46 @@ void Solver::feed(int a, value val)
 
 	int y = y_a(a),
 		x = x_a(a);
-
-	for (int xi = 0; xi < line(); xi++) {				// walk row
-		if (vpossible[a_xy(xi, y)] && xi != x){
-			discard(a_xy(xi, y), val);
-			if (early())
-				return;
-        }
-    }
-
-	for (int yi = 0; yi < line(); yi++) {				// walk col
-		if (vpossible[a_xy(x, yi)] && yi != y){
-			discard(a_xy(x,yi), val);
-			if (early())
-				return;
-        }
-    }
-
 	int b = b_xy(x,y),
 		f = f_xy(x,y);
 
-	for (int fi = 0; fi < line(); fi++) {				// walk box
-		if (vpossible[a_bf(b, fi)] && fi != f){
-			discard(a_bf(b, fi), val);
-			if (early())
-				return;
-        }
+    for (int u = 0; u < line(); ++u) {
+		if (vpossible[a_xy(u, y)] && u != x)
+			discard(a_xy(u, y), val);
+		if (vpossible[a_xy(x, u)] && u != y)
+			discard(a_xy(x, u), val);
+		if (vpossible[a_bf(b, u)] && u != f)
+			discard(a_bf(b, u), val);
+        if (early())
+            return;
     }
+
+	//--------------------------------------------------
+	// for (int xi = 0; xi < line(); xi++) {				// walk row
+	// 	if (vpossible[a_xy(xi, y)] && xi != x){
+	// 		discard(a_xy(xi, y), val);
+	// 		if (early())
+	// 			return;
+    //     }
+    // }
+    // 
+	// for (int yi = 0; yi < line(); yi++) {				// walk col
+	// 	if (vpossible[a_xy(x, yi)] && yi != y){
+	// 		discard(a_xy(x,yi), val);
+	// 		if (early())
+	// 			return;
+    //     }
+    // }
+    // 
+    // 
+	// for (int fi = 0; fi < line(); fi++) {				// walk box
+	// 	if (vpossible[a_bf(b, fi)] && fi != f){
+	// 		discard(a_bf(b, fi), val);
+	// 		if (early())
+	// 			return;
+    //     }
+    // }
+	//-------------------------------------------------- 
 }
 
 
@@ -188,7 +229,7 @@ void Solver::discard(int a, value val)
 }
 
 
-void Solver::deepthoughts(bool smart, bool clever)
+void Solver::deepthoughts(bool smart, bool clever, bool test_alldiff)
 {
 	while (dirty() && !solved() && !error()) {
 		dirty_ = false;
@@ -199,6 +240,8 @@ void Solver::deepthoughts(bool smart, bool clever)
 		if (clever)
 			thinkclever();
 	}
+    if (test_alldiff && !solved() && !error() && !alldiff_constraints())
+        error_ = true;
 }
 
 /*
@@ -265,7 +308,7 @@ void Solver::thinksmart()
 
 	walk through unit U.
 	if there is a subunit SU which can hold a value V as the only subunit of U,
-	then discard V in the accurate "cross-unit" CU of SU
+	then discard V in the complement unit CU of SU (CU [+] SU = U)
 
 	CU is (besides U) the only unit that completely includes SU
 */
@@ -382,6 +425,33 @@ void Solver::thinkclever()
 	}
 }
 
+/*
+ * Walk through every unit U and check if there are more than
+ * sizeof(U) possible values over all.
+ */
+
+bool Solver::alldiff_constraints()
+{
+    std::vector<bool>
+        row_values(num_values(), false),
+        col_values(num_values(), false),
+        block_values(num_values(), false);
+    for (int u = 0; u < line(); ++u) {
+        // to do: speed this up by looking at cells first which allow all values (?)
+        for (int w = 0; w < line(); ++w) {
+            for (value v = min_value(); v <= max_value(); ++v) {
+                if (possible(a_xy(w, u), v)) row_values[v - 1] = true;
+                if (possible(a_xy(u, w), v)) col_values[v - 1] = true;
+                if (possible(a_bf(u, w), v)) block_values[v - 1] = true;
+            }
+        }
+        if (std::any_of(row_values, std::bind2nd(std::equal_to<bool>(), false))
+                || std::any_of(col_values, std::bind2nd(std::equal_to<bool>(), false))
+                || std::any_of(block_values, std::bind2nd(std::equal_to<bool>(), false)))
+            return false;
+    }
+    return true;
+}
 
 
 /*
@@ -394,9 +464,9 @@ void Solver::thinkclever()
 /// solve
 
 
-void Solver::fill()
+void Solver::fill(int max_backtrack)
 {
-	solve(-1, method_findany);
+	solve(-1, method_findany, max_backtrack);
 }
 
 void Solver::test(int max_depth)
@@ -411,7 +481,7 @@ struct L {
     field values;
 };
     
-void Solver::solve(int max_depth, int method)
+void Solver::solve(int max_depth, int method, int max_backtrack)
 {
 	bool smart = true, clever = false;
 
@@ -419,6 +489,7 @@ void Solver::solve(int max_depth, int method)
 	smart_ = false;
 	clever_ = false;
 	immediate_ = method == method_findany || method == method_test;
+	// deepthoughts(smart, clever, method == method_findany);
 	deepthoughts(smart, clever);
 
 	Sudoku solution,
@@ -426,7 +497,8 @@ void Solver::solve(int max_depth, int method)
 
 
 	std::vector<L> track;
-	int currentlevel=0;
+	int currentlevel = 0,
+        backtracks = 0;
 	bool found = solved() && !error(),
 		toohard = false, multiple = false, usesolution = false,
 		pushlevel = !solved() && !error();
@@ -437,6 +509,8 @@ void Solver::solve(int max_depth, int method)
 				toohard = true;
 				break;
             }
+            // apply MRV heuristic:
+            // (to do: gradheuristic [waehle zelle,wert mit groesstem verzweigungsgrad])
 			int a = 0,
                 cardinality = line() + 1;
 			for (int ai = 0; ai < area(); ai++)
@@ -460,11 +534,18 @@ void Solver::solve(int max_depth, int method)
 				state.set(track.back().a, 0);
 			set(state);
 			pushlevel = false;
+            if (++backtracks == max_backtrack) {
+                toohard_ = true;
+                error_ = false;
+                break;
+            }
 		} else {
+            // to do: heuristik des geringst einschraenkenden wertes
 			int iv = l.values.size()-1;
 			int v = l.values[iv];
 			l.values.erase(l.values.begin() + iv);
 			feed(l.a, v);
+			// deepthoughts(smart, clever, method == method_findany);
 			deepthoughts(smart, clever);
 
 			if (solved() && !error()) {
@@ -496,7 +577,7 @@ void Solver::solve(int max_depth, int method)
 	if (multiple || toohard)
 	{
 		if (depth_) {
-			for (int i = 0; i < track.size(); i++) {
+			for (std::size_t i = 0; i < track.size(); i++) {
 				L& l = track[i];
 				state.set(l.a, 0);
             }
@@ -512,7 +593,7 @@ void Solver::solve(int max_depth, int method)
 	else		// ... error
 	{
 		if (depth_) {
-			for (int i = 0; i < track.size(); i++){
+			for (std::size_t i = 0; i < track.size(); i++){
 				L& l = track[i];
 				state.set(l.a, 0);
             }
@@ -538,3 +619,4 @@ void Solver::solve(int max_depth, int method)
 }
 
 }
+

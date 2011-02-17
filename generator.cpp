@@ -1,7 +1,7 @@
 
 #include <cstdlib>     /* rand functions */
 #include <ctime>       /*  */
-#include <algorithm>    /* tsd::generate */
+#include <algorithm>    /* std::generate */
 #include <vector>
 
 
@@ -65,7 +65,7 @@ int minimum_fill(int difficulty, Size size)
         }
     }
     else {
-        return size.area() / (2.1 + difficulty * 0.5);
+        return (int) (size.area() / (2.1 + difficulty * 0.5));
     }
 	return 0;
 }
@@ -87,7 +87,7 @@ int maximum_fill(int difficulty, Size size)
         }
     }
     else {
-        return size.area() / (1.2 + difficulty * 0.5);
+        return (int) (size.area() / (1.2 + difficulty * 0.5));
     }
 	return size.area();
 }
@@ -147,8 +147,6 @@ void Generator::set(const Size& size)
 {
     m_sudoku = size;
 }
-
-
 
 
 bool Generator::obfuscate(int difficulty, int min_fill, int max_fill, int max_depth)
@@ -219,41 +217,45 @@ bool Generator::obfuscate(int difficulty, int min_fill, int max_fill, int max_de
 }
 
 
-bool Generator::fill()
+bool Generator::fill(int max_backtrack)
 {
-	Solver solve(m_sudoku);
-
+	Solver solve;
     Size size = m_sudoku.size();
-	if (solve.unsolved() == size.area()) {
-		for (int f = 0; f < size.line(); f++) {				// fill 1st block
-			if (solve.error())                                  // this should be impossible
-				return false;
+    bool empty = solve.unsolved() == size.area();
 
-			int a = size.a_bf(0, f);
-			int iv = getrand(solve.repertoire(a));
-			solve.feed(a, solve.repertoire(a, iv));
-		}
+    do {
+        solve.set(m_sudoku);
+        if (empty) {
+            for (int f = 0; f < size.line(); f++) {				// fill 1st block
+                if (solve.error())                                  // this should be impossible
+                    return false;
 
-	//	for (int y=solve.fy(); y < solve.line(); y++)				// fill 1st column
-	//	{
-	//		int a = solve.a_xy(0,y);
-	//		int iv = getrand(solve.possibilities(a));
-	//		solve.setsolution(a, solve.possibility(a, iv));
-	//	}
+                int a = size.a_bf(0, f);
+                int iv = getrand(solve.repertoire(a));
+                solve.feed(a, solve.repertoire(a, iv));
+            }
 
-	}
+        //	for (int y=solve.fy(); y < solve.line(); y++)				// fill 1st column
+        //	{
+        //		int a = solve.a_xy(0,y);
+        //		int iv = getrand(solve.possibilities(a));
+        //		solve.setsolution(a, solve.possibility(a, iv));
+        //	}
 
-    solve.fill();
-    if (solve.error())
-        return false;
+        }
+
+        solve.fill(max_backtrack);
+        if (solve.error())
+            return false;
+    } while (solve.toohard() && empty);
 
 	m_sudoku = solve.get();
 	return true;
 }
 
-bool Generator::generate(int difficulty, int min_fill, int max_fill, int max_depth)
+bool Generator::generate(int difficulty, int min_fill, int max_fill, int max_depth, int max_backtrack)
 {
-    return fill() &&
+    return fill(max_backtrack) &&
             obfuscate(difficulty, min_fill, max_fill, max_depth);
 }
 

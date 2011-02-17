@@ -43,13 +43,16 @@ public:
     Sudoku get() const;
 
     
-	void solve(int max_depth, int method=method_findunique);			// solve until error / ambiguous
+	void solve(int max_depth,
+            int method=method_findunique,		// solve until error / ambiguous
+            int max_backtrack  = -1);
 	void test(int max_depth);
-	void fill();
+	void fill(int max_backtrack = -1);
 
-	void deepthoughts(bool smart, bool clever);
+	void deepthoughts(bool smart, bool clever, bool test_alldiff = false);
 	void thinksmart();
 	void thinkclever();
+    bool alldiff_constraints();
 
     //
     void feed(int a, value v);
