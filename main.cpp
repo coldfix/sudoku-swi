@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     generator.fill();
 	sudoku::Sudoku full = generator.get();
 
-    generator.obfuscate(sudoku::difficulty_medium);
+    generator.obfuscate(sudoku::Difficulty::Medium);
     sudoku::Sudoku riddle = generator.get();
 
 	sudoku::Sudoku& print = printsolution ? full : riddle;

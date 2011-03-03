@@ -19,8 +19,8 @@ public:
 	const Sudoku& get() const { return m_sudoku; }
 
     bool fill(int max_backtrack = 5);
-    bool obfuscate(int difficulty, int min_fill=-1, int max_fill=-1, int max_depth=-1);
-    bool generate(int difficulty, int min_fill=-1, int max_fill=-1, int max_depth=-1,
+    bool obfuscate(Difficulty, int min_fill=-1, int max_fill=-1, int max_depth=-1);
+    bool generate(Difficulty, int min_fill=-1, int max_fill=-1, int max_depth=-1,
             int max_backtrack = 5);
 
     void initRand();

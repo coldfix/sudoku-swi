@@ -6,15 +6,10 @@
 
 namespace sudoku
 {
-
     typedef boost::int16_t coord;
     typedef boost::int8_t value;
 
-    enum {
-        difficulty_easy,
-        difficulty_medium,
-        difficulty_hard
-    };
+    enum class Difficulty { Easy, Medium, Hard };
 
 
 /*
@@ -28,7 +23,7 @@ class Size
 public:
 	Size() : nbx(), nby(), row(), total() { }
 	Size(coord bx, coord by)		{ set(bx,by); }
-	// Size(const Size& s) = default;
+	Size(const Size& s) = default;
 
     void set(coord _nbx, coord _nby)
     {
@@ -39,11 +34,10 @@ public:
     }
 
 	/// size
-
-	coord bx() const					{ return nbx; }
-	coord by() const					{ return nby; }
-	coord fx() const					{ return nby; }
-	coord fy() const					{ return nbx; }
+	coord bx() const			    { return nbx; }
+	coord by() const			    { return nby; }
+	coord fx() const			    { return nby; }
+	coord fy() const			    { return nbx; }
     
 	coord line() const				{ return row; }
 	coord area() const				{ return total; }
@@ -52,37 +46,36 @@ public:
 
 	value max_value() const			{ return row; }
 	value min_value() const			{ return 1; }
-    coord num_values() const          { return row; }
+    coord num_values() const        { return row; }
 
 	bool operator  == (const Size& ds) const
     {
 		return bx() == ds.bx() && by() == ds.by();
     }
+
     bool operator  != (const Size& ds) const
     {
         return !(*this == ds);
     }
 
-
 	/// coord transformations
-
-	coord a_xy(coord x,coord y) const		{ return x * line() + y; }
-	coord a_bf(coord b,coord f) const		{ return a_xy(x_bf(b,f), y_bf(b,f)); }
+	coord a_xy(coord x,coord y) const	{ return x * line() + y; }
+	coord a_bf(coord b,coord f) const	{ return a_xy(x_bf(b,f), y_bf(b,f)); }
 
 	coord x_a(coord a) const			{ return a / line(); }
 	coord y_a(coord a) const			{ return a % line(); }
 	coord b_a(coord a) const			{ return b_hl(xb_a(a), yb_a(a)); }
 	coord f_a(coord a) const			{ return f_hl(xf_a(a), yf_a(a)); }
 
-	coord x_bf(coord b,coord f) const		{ return x_hl(xb_b(b), xf_f(f)); }
-	coord y_bf(coord b,coord f) const		{ return y_hl(yb_b(b), yf_f(f)); }
-	coord b_xy(coord x,coord y) const		{ return b_hl(xb_x(x), yb_y(y)); }
-	coord f_xy(coord x,coord y) const		{ return f_hl(xf_x(x), yf_y(y)); }
+	coord x_bf(coord b,coord f) const	{ return x_hl(xb_b(b), xf_f(f)); }
+	coord y_bf(coord b,coord f) const	{ return y_hl(yb_b(b), yf_f(f)); }
+	coord b_xy(coord x,coord y) const	{ return b_hl(xb_x(x), yb_y(y)); }
+	coord f_xy(coord x,coord y) const	{ return f_hl(xf_x(x), yf_y(y)); }
 
-	coord x_hl(coord h,coord l) const		{ return h * fx() + l; }
-	coord y_hl(coord h,coord l) const		{ return h * fy() + l; }
-	coord b_hl(coord h,coord l) const		{ return h * by() + l; }
-	coord f_hl(coord h,coord l) const		{ return h * fy() + l; }
+	coord x_hl(coord h,coord l) const	{ return h * fx() + l; }
+	coord y_hl(coord h,coord l) const	{ return h * fy() + l; }
+	coord b_hl(coord h,coord l) const	{ return h * by() + l; }
+	coord f_hl(coord h,coord l) const	{ return h * fy() + l; }
 
 	coord xb_x(coord x) const			{ return x / fx(); }
 	coord xf_x(coord x) const			{ return x % fx(); }
@@ -100,9 +93,7 @@ public:
 	coord yf_a(coord a) const			{ return yf_y(y_a(a)); }
 
 protected:
-
 	/// members
-
 	coord nbx, nby, row, total;
 };
 

@@ -49,53 +49,53 @@ public:
 
  // difficulty settings
 
-int minimum_fill(int difficulty, Size size)
+int minimum_fill(Difficulty difficulty, Size size)
 {
     if (size.line() == 9) {
         switch (difficulty) {
-            case difficulty_hard:   return 15;
-            case difficulty_medium: return 27;
-            case difficulty_easy:   return 35;
+            case Difficulty::Hard:   return 15;
+            case Difficulty::Medium: return 27;
+            case Difficulty::Easy:   return 35;
         }
     }
     else if (size.line() == 6) {
         switch (difficulty) {
-            case difficulty_hard:   return 4;
-            case difficulty_medium: return 10;
-            case difficulty_easy:   return 14;
+            case Difficulty::Hard:   return 4;
+            case Difficulty::Medium: return 10;
+            case Difficulty::Easy:   return 14;
         }
     }
     else {
-        return (int) (size.area() / (2.1 + difficulty * 0.5));
+        return (int) (size.area() / (2.1 + int(difficulty) * 0.5));
     }
 	return 0;
 }
 
-int maximum_fill(int difficulty, Size size)
+int maximum_fill(Difficulty difficulty, Size size)
 {
     if (size.line() == 9) {
         switch (difficulty) {
-            case difficulty_hard:   return 26;
-            case difficulty_medium: return 34;
-            case difficulty_easy:   return 44;
+            case Difficulty::Hard:   return 26;
+            case Difficulty::Medium: return 34;
+            case Difficulty::Easy:   return 44;
         }
     }
     else if (size.line() == 6) {
         switch (difficulty) {
-            case difficulty_hard:   return 9;
-            case difficulty_medium: return 13;
-            case difficulty_easy:   return 18;
+            case Difficulty::Hard:   return 9;
+            case Difficulty::Medium: return 13;
+            case Difficulty::Easy:   return 18;
         }
     }
     else {
-        return (int) (size.area() / (1.2 + difficulty * 0.5));
+        return (int) (size.area() / (1.2 + int(difficulty) * 0.5));
     }
 	return size.area();
 }
 
-int maximum_depth(int difficulty, Size size)
+int maximum_depth(Difficulty difficulty, Size size)
 {
-    if (difficulty < difficulty_hard)
+    if (difficulty != Difficulty::Hard)
         return 0;
     else if (size.line() <= 9)
         return 6;
@@ -150,66 +150,54 @@ void Generator::set(const Size& size)
 }
 
 
-bool Generator::obfuscate(int difficulty, int min_fill, int max_fill, int max_depth)
+bool Generator::obfuscate(Difficulty difficulty, int min_fill, int max_fill, int max_depth)
 {
 	const Sudoku& sudoku = m_sudoku;
-
     Size size = m_sudoku.size();
 
     if (min_fill < 0)   min_fill = minimum_fill(difficulty, size);
     if (max_fill < 0)   max_fill = maximum_fill(difficulty, size);
     if (max_depth < 0)  max_depth = maximum_depth(difficulty, size);
 
-
 	Solver solve(size);
 	Sudoku riddle(size);
-
 	std::vector<coord> as(size.area());
 	std::generate(as.begin(), as.end(), IntSequence<coord>(0));
 
-	while (!solve.solved() || riddle.solved() < min_fill)	// offene felder auswuerfeln
-	{
+	while (!solve.solved() || riddle.solved() < min_fill) {	// offene felder auswuerfeln
 		if (!as.size())
 			break;
-
 		coord a = remove_random(as);
 		if (solve.solved(a) || !sudoku[a])
 			continue;
-
 		riddle.set(a, sudoku[a]);
 		solve.feed(a, sudoku[a]);
-
-		if (solve.error()){
-			return false; }
+		if (solve.error())
+			return false;
 	}
 
-	if (riddle.solved() >= min_fill)		// obfuscate riddle according to difficulty level
-	{
+	if (riddle.solved() >= min_fill) {		// obfuscate riddle according to difficulty level
 		as.clear();
 		as.reserve(riddle.solved());
         for (coord a = 0; a < size.area(); a++)
 			if (riddle[a])
 				as.push_back(a);
 
-		while (as.size() && riddle.solved() > min_fill)
-		{
+		while (as.size() && riddle.solved() > min_fill) {
 			coord a = remove_random(as);
 			riddle.set(a, 0);
 			solve.set(riddle);
 			solve.test(max_depth);
 
-			if (!solve.solved() || solve.difficulty() > difficulty)
-			{
+			if (!solve.solved() || int(solve.difficulty()) > int(difficulty)) {
 				riddle.set(a, sudoku[a]);
 				continue;
 			}
 
 			if (solve.difficulty() == difficulty
-				&& riddle.solved() <= max_fill
-				&& getrand(1000) < 350)
-			{
+                    && riddle.solved() <= max_fill
+                    && getrand(1000) < 350)
 				break;
-			}
 		}
 	}
 
@@ -254,7 +242,7 @@ bool Generator::fill(int max_backtrack)
 	return true;
 }
 
-bool Generator::generate(int difficulty, int min_fill, int max_fill, int max_depth, int max_backtrack)
+bool Generator::generate(Difficulty difficulty, int min_fill, int max_fill, int max_depth, int max_backtrack)
 {
     return fill(max_backtrack) &&
             obfuscate(difficulty, min_fill, max_fill, max_depth);

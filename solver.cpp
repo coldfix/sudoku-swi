@@ -19,10 +19,12 @@ namespace std
     //         return a == b;
     //     }
     //-------------------------------------------------- 
-    template <class I, class P>
-        bool any_of(I begin, I end, P pred) {
-            return find_if(begin, end, pred) != end;
-        }
+    //--------------------------------------------------
+    // template <class I, class P>
+    //     bool any_of(I begin, I end, P pred) {
+    //         return find_if(begin, end, pred) != end;
+    //     }
+    //-------------------------------------------------- 
     template <class C, class P>
         bool any_of(C container, P pred) {
             return any_of(container.begin(), container.end(), pred);
@@ -435,12 +437,12 @@ bool Solver::alldiff_constraints()
 
 void Solver::fill(int max_backtrack)
 {
-	solve(-1, method_findany, max_backtrack);
+	solve(-1, Method::findany, max_backtrack);
 }
 
 void Solver::test(int max_depth)
 {
-	solve(max_depth, method_test);
+	solve(max_depth, Method::test);
 }
 
 
@@ -450,15 +452,15 @@ struct L {
     field values;
 };
     
-void Solver::solve(int max_depth, int method, int max_backtrack)
+void Solver::solve(int max_depth, Method method, int max_backtrack)
 {
 	bool smart = true, clever = false;
 
     depth_ = 0;
 	smart_ = false;
 	clever_ = false;
-	immediate_ = method == method_findany || method == method_test;
-	// deepthoughts(smart, clever, method == method_findany);
+	immediate_ = method == Method::findany || method == Method::test;
+	// deepthoughts(smart, clever, method == Method::findany);
 	deepthoughts(smart, clever);
 
 	Sudoku solution,
@@ -514,19 +516,19 @@ void Solver::solve(int max_depth, int method, int max_backtrack)
 			value v = l.values[iv];
 			l.values.erase(l.values.begin() + iv);
 			feed(l.a, v);
-			// deepthoughts(smart, clever, method == method_findany);
+			// deepthoughts(smart, clever, method == Method::findany);
 			deepthoughts(smart, clever);
 
 			if (solved() && !error()) {
                 if (found)
                     multiple = true;
                 
-				if (multiple && (method == method_findunique || method == method_test)) {
+				if (multiple && (method == Method::findunique || method == Method::test)) {
 					multiple = true;
 					break;
 				} else {
 					found = true;
-					if (method == method_findany)
+					if (method == Method::findany)
 						break;
 					solution = get();
 					usesolution = true;
@@ -573,11 +575,11 @@ void Solver::solve(int max_depth, int method, int max_backtrack)
 	}
 
 	if (!smart_)
-		difficulty_ = difficulty_easy;
+		difficulty_ = Difficulty::Easy;
 	else if (depth_ == 0 && !clever_)
-		difficulty_ = difficulty_medium;
+		difficulty_ = Difficulty::Medium;
 	else
-		difficulty_ = difficulty_hard;
+		difficulty_ = Difficulty::Hard;
 
 	multiple_ = multiple;
 	unique_ = solved() && !error();

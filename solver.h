@@ -21,13 +21,16 @@ public:
 
 	/// consts & types
 
-	enum { state_error = 0 };
+	// enum class Value {
+    //     Error = 0
+    // };
 
+    enum { state_error = 0 };
     
-    enum{
-        method_findany,
-        method_findunique,
-        method_test
+    enum class Method {
+        findany,
+        findunique,
+        test
     };
 
 
@@ -44,7 +47,7 @@ public:
 
     
 	void solve(int max_depth,
-            int method=method_findunique,		// solve until error / ambiguous
+            Method method=Method::findunique,		// solve until error / ambiguous
             int max_backtrack  = -1);
 	void test(int max_depth);
 	void fill(int max_backtrack = -1);
@@ -75,7 +78,7 @@ public:
 	bool toohard() const { return toohard_; }			//Solver couldn't make sure there is no other way to solve the sudoku than the found solutions
 	int depth() const { return depth_; }			    //
 
-	int difficulty() const { return difficulty_; }
+	Difficulty difficulty() const { return difficulty_; }
 	bool smart() const { return smart_; }
 	bool clever() const { return clever_; }
 	bool multiple() const { return multiple_; }
@@ -83,17 +86,17 @@ public:
 
 	///
 
-    bool ok(coord a) const                { return cells_[a] != state_error && (!solved(a) || possible(a, solution(a))); }
-	bool solved(coord a) const            { return cells_[a] > 0; }
+    bool ok(coord a) const              { return cells_[a] != state_error && (!solved(a) || possible(a, solution(a))); }
+	bool solved(coord a) const          { return cells_[a] >= min_value(); }
     
-    bool* gourmets(value v)             { return values_ + (v-1) * area(); }
-    const bool* gourmets(value v) const { return values_ + (v-1) * area(); }
+    bool* gourmets(value v)             { return values_ + (v - min_value()) * area(); }
+    const bool* gourmets(value v) const { return values_ + (v - min_value()) * area(); }
     bool possible(coord a, value v) const { return gourmets(v)[a]; }
 
-	value solution(coord a) const         { return cells_[a]; }
+	value solution(coord a) const       { return cells_[a]; }
 
 
-    coord repertoire(coord a) const         { return cells_[a] > 0 ? 1 : -cells_[a]; }
+    coord repertoire(coord a) const     { return cells_[a] > 0 ? 1 : -cells_[a]; }
     void repertoire(coord a, field& v) const;
     value repertoire(coord a, coord i) const;
 
@@ -112,7 +115,8 @@ protected:
 	coord unsolved_;
 
 	bool toohard_, unique_, hassolution_, multiple_, immediate_;
-	int depth_, difficulty_;
+	int depth_;
+    Difficulty difficulty_;
 
     Size size_;
 };

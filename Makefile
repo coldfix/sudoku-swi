@@ -5,9 +5,9 @@
 BIN = sudoku.elf
 OBJ = main.o solver.o generator.o
 
-CC = g++
+CC = g++-4.5
 
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -std=c++0x
 LFLAGS = -Wall -O3
 
 
