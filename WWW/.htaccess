@@ -1,0 +1,7 @@
+DirectoryIndex sudoku.php
+
+<Files sudoku.elf>
+  order allow,deny
+  deny from all
+</Files>
+
