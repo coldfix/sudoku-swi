@@ -30,8 +30,7 @@ table.sudoku {
     margin-bottom: 15px;
     border-spacing: 0em;
     table-layout: fixed;
-    border-collapse: collapse;
-    border-spacing: 0px;
+    border-spacing: 1px;
 }
 
 table.sudoku td {
