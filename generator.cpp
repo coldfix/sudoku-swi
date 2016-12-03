@@ -27,21 +27,21 @@ int getrand(int range, int min = 0)
 template<class T>
 T remove_random(std::vector<T>& v)
 {
-	int i = getrand(v.size());
-	T elem = v[i];
-	std::swap(v[i], v[v.size()-1]);
-	v.pop_back();
-	return elem;
+    int i = getrand(v.size());
+    T elem = v[i];
+    std::swap(v[i], v[v.size()-1]);
+    v.pop_back();
+    return elem;
 }
 
 template <class T>
 class IntSequence {
-	T counter;
+    T counter;
 public:
-	IntSequence (T start = T()) : counter(start) { }
+    IntSequence (T start = T()) : counter(start) { }
 
-	T operator() () {
-		return counter++; }
+    T operator() () {
+        return counter++; }
 };
 
 /*
@@ -68,7 +68,7 @@ int minimum_fill(Difficulty difficulty, Size size)
     else {
         return (int) (size.area() / (2.1 + int(difficulty) * 0.5));
     }
-	return 0;
+    return 0;
 }
 
 int maximum_fill(Difficulty difficulty, Size size)
@@ -90,7 +90,7 @@ int maximum_fill(Difficulty difficulty, Size size)
     else {
         return (int) (size.area() / (1.2 + int(difficulty) * 0.5));
     }
-	return size.area();
+    return size.area();
 }
 
 int maximum_depth(Difficulty difficulty, Size size)
@@ -114,10 +114,10 @@ bool Generator::s_initialized = 0;
 
 void Generator::initRand()
 {
-	if (!s_initialized) {
+    if (!s_initialized) {
         std::srand(std::time(0));
-		s_initialized = true;
-	}
+        s_initialized = true;
+    }
 }
 
 
@@ -127,13 +127,13 @@ Generator::Generator()
 }
 
 Generator::Generator(const Sudoku& sudoku)
-	: m_sudoku(sudoku)
+    : m_sudoku(sudoku)
 {
     initRand();
 }
 
 Generator::Generator(const Size& size)
-	: m_sudoku(size)
+    : m_sudoku(size)
 {
     initRand();
 }
@@ -152,70 +152,70 @@ void Generator::set(const Size& size)
 
 bool Generator::obfuscate(Difficulty difficulty, int min_fill, int max_fill, int max_depth)
 {
-	const Sudoku& sudoku = m_sudoku;
+    const Sudoku& sudoku = m_sudoku;
     Size size = m_sudoku.size();
 
     if (min_fill < 0)   min_fill = minimum_fill(difficulty, size);
     if (max_fill < 0)   max_fill = maximum_fill(difficulty, size);
     if (max_depth < 0)  max_depth = maximum_depth(difficulty, size);
 
-	Solver solve(size);
-	Sudoku riddle(size);
-	std::vector<coord> as(size.area());
-	std::generate(as.begin(), as.end(), IntSequence<coord>(0));
+    Solver solve(size);
+    Sudoku riddle(size);
+    std::vector<coord> as(size.area());
+    std::generate(as.begin(), as.end(), IntSequence<coord>(0));
 
-	while (!solve.solved() || riddle.solved() < min_fill) {	// offene felder auswuerfeln
-		if (!as.size())
-			break;
-		coord a = remove_random(as);
-		if (solve.solved(a) || !sudoku[a])
-			continue;
-		riddle.set(a, sudoku[a]);
-		solve.feed(a, sudoku[a]);
-		if (solve.error())
-			return false;
-	}
+    while (!solve.solved() || riddle.solved() < min_fill) { // offene felder auswuerfeln
+        if (!as.size())
+            break;
+        coord a = remove_random(as);
+        if (solve.solved(a) || !sudoku[a])
+            continue;
+        riddle.set(a, sudoku[a]);
+        solve.feed(a, sudoku[a]);
+        if (solve.error())
+            return false;
+    }
 
-	if (riddle.solved() >= min_fill) {		// obfuscate riddle according to difficulty level
-		as.clear();
-		as.reserve(riddle.solved());
+    if (riddle.solved() >= min_fill) {      // obfuscate riddle according to difficulty level
+        as.clear();
+        as.reserve(riddle.solved());
         for (coord a = 0; a < size.area(); a++)
-			if (riddle[a])
-				as.push_back(a);
+            if (riddle[a])
+                as.push_back(a);
 
-		while (as.size() && riddle.solved() > min_fill) {
-			coord a = remove_random(as);
-			riddle.set(a, 0);
-			solve.set(riddle);
-			solve.test(max_depth);
+        while (as.size() && riddle.solved() > min_fill) {
+            coord a = remove_random(as);
+            riddle.set(a, 0);
+            solve.set(riddle);
+            solve.test(max_depth);
 
-			if (!solve.solved() || int(solve.difficulty()) > int(difficulty)) {
-				riddle.set(a, sudoku[a]);
-				continue;
-			}
+            if (!solve.solved() || int(solve.difficulty()) > int(difficulty)) {
+                riddle.set(a, sudoku[a]);
+                continue;
+            }
 
-			if (solve.difficulty() == difficulty
+            if (solve.difficulty() == difficulty
                     && riddle.solved() <= max_fill
                     && getrand(1000) < 350)
-				break;
-		}
-	}
+                break;
+        }
+    }
 
-	m_sudoku = riddle;
-	return true;
+    m_sudoku = riddle;
+    return true;
 }
 
 
 bool Generator::fill(int max_backtrack)
 {
-	Solver solve;
+    Solver solve;
     Size size = m_sudoku.size();
     bool empty = solve.unsolved() == size.area();
 
     do {
         solve.set(m_sudoku);
         if (empty) {
-            for (coord f = 0; f < size.line(); f++) {				// fill 1st block
+            for (coord f = 0; f < size.line(); f++) {               // fill 1st block
                 if (solve.error())                                  // this should be impossible
                     return false;
 
@@ -224,12 +224,12 @@ bool Generator::fill(int max_backtrack)
                 solve.feed(a, solve.repertoire(a, iv));
             }
 
-        //	for (coord y=solve.fy(); y < solve.line(); y++)				// fill 1st column
-        //	{
-        //		coord a = solve.a_xy(0,y);
-        //		int iv = getrand(solve.possibilities(a));
-        //		solve.setsolution(a, solve.possibility(a, iv));
-        //	}
+        //  for (coord y=solve.fy(); y < solve.line(); y++)             // fill 1st column
+        //  {
+        //      coord a = solve.a_xy(0,y);
+        //      int iv = getrand(solve.possibilities(a));
+        //      solve.setsolution(a, solve.possibility(a, iv));
+        //  }
 
         }
 
@@ -238,8 +238,8 @@ bool Generator::fill(int max_backtrack)
             return false;
     } while (solve.toohard() && empty);
 
-	m_sudoku = solve.get();
-	return true;
+    m_sudoku = solve.get();
+    return true;
 }
 
 bool Generator::generate(Difficulty difficulty, int min_fill, int max_fill, int max_depth, int max_backtrack)

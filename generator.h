@@ -16,7 +16,7 @@ public:
     void set(const Sudoku&);
     void set(const Size&);
 
-	const Sudoku& get() const { return m_sudoku; }
+    const Sudoku& get() const { return m_sudoku; }
 
     bool fill(int max_backtrack = 5);
     bool obfuscate(Difficulty, int min_fill=-1, int max_fill=-1, int max_depth=-1);
@@ -27,7 +27,7 @@ public:
 
 protected:
     static bool s_initialized;
-	Sudoku m_sudoku;
+    Sudoku m_sudoku;
 
 };
 
