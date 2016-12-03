@@ -1,7 +1,0 @@
-
-# Restrict external access to this folder:
-
-Order allow,deny
-Deny from all
-Satisfy all
-
