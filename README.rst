@@ -18,8 +18,8 @@ your own, whether you want to look at such ugliness.
 Installation
 ~~~~~~~~~~~~
 
-Put the folder somewhere in your webroot, enable PHP.
+Make the ``html/`` folder accessible somewhere in your webroot, enable PHP.
 
-Build the generator_ and put the ``sudoku`` binary in this folder.
+Build the generator_ and put the ``sudoku`` binary in ``html/``.
 
 .. _generator: https://github.com/coldfix/sudoku-cli
