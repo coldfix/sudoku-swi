@@ -11,8 +11,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <body>
 <div id="content">
 
-<a href="./wettspiel.ods">Das Game</a>
-
  <h3>Sudoku</h3>
 <?php
     $cols = 3;
