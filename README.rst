@@ -3,13 +3,21 @@ sudoku-cli
 
 Simple command line interface for a sudoku generator.
 
-Coded years ago in horrible C++11 ;)
+Be warned, I coded this as a teenager in between 2006-2011 and only imported
+into git later. The code is in horrible C++0x (as it was called back then)
+with only the features that were supported by the latest version of g++ 4.5 ;)
 
 
 Build
 ~~~~~
 
-If you're lucky, have *gcc* on linux, just type::
+You need
+
+- g++
+- libboost-dev
+- some luck
+
+On linux, type::
 
     make
 
