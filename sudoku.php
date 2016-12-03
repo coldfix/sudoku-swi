@@ -48,7 +48,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <table class="sudoku">
 <?php
 
-    exec("./sudoku.elf $dim --solution", $riddle, $code);
+    exec("./sudoku $dim --solution", $riddle, $code);
 
     if ($code != 0) {
         die ("Fatal error: $code! Please contact t_glaessle@gmx.de");
