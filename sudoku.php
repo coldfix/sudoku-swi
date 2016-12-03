@@ -3,12 +3,12 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
- <title>Sudoku</title>
- <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
- <link rel="stylesheet" type="text/css" href="./sudoku.css"/>
- <script type="text/javascript" src="jquery.js"></script>
+  <title>Sudoku</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="./sudoku.css"/>
+  <script type="text/javascript" src="jquery.js"></script>
 </head>
-<body> 
+<body>
 <div id="content">
 
 <a href="./wettspiel.ods">Das Game</a>
@@ -23,11 +23,11 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         $cols = $c;
         $rows = $r;
     }
-    
-	// $size = $length >= 10 ? 2 : 1;
+
+    // $size = $length >= 10 ? 2 : 1;
     $length = $cols * $rows;
     $dim = $cols.'x'.$rows;
-    
+
     $options = array("2x2", "3x3", "4x4");
     if (!in_array($dim, $options))
         $options[] = $dim;
@@ -71,37 +71,37 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         foreach ($cells as $cell) {
             if ($cell == "")
                 continue;
-			$is_hidden = false;
+            $is_hidden = false;
 
-			$col_attr = "";
-			if ($cell != 0) $col_attr .= "r";
-			if ($col%$cols == 0 && $col != 0) $col_attr .= " left";
-			if (($col+1)%$cols == 0 && $col+1 != $length) $col_attr .= " right";
+            $col_attr = "";
+            if ($cell != 0) $col_attr .= "r";
+            if ($col%$cols == 0 && $col != 0) $col_attr .= " left";
+            if (($col+1)%$cols == 0 && $col+1 != $length) $col_attr .= " right";
 
-			$hidden_attr = "";
-			if (substr($cell, 0, 1) == "~") {
-				$cell = substr($cell, 1);
-				$is_hidden = true;
-				// $hidden_attr = " hidden";
-			}
-
-			$attr = trim ($col_attr . $row_attr . $hidden_attr);
-			if ($attr)
-				$attr = " class=\"$attr\"";
-
-			echo "  <td$attr>";
-			if ($is_hidden) {
-				echo "<span class=\"hidden\">$cell</span>";
-				// echo "<input type=\"text\" class=\"edit\" size=\"2\"/>";
+            $hidden_attr = "";
+            if (substr($cell, 0, 1) == "~") {
+                $cell = substr($cell, 1);
+                $is_hidden = true;
+                // $hidden_attr = " hidden";
             }
-			else
-				echo $cell;
-			echo "</td>\n";
-			++$col;
-		}
-		echo " </tr>\n";
-		++$row;
-	}
+
+            $attr = trim ($col_attr . $row_attr . $hidden_attr);
+            if ($attr)
+                $attr = " class=\"$attr\"";
+
+            echo "  <td$attr>";
+            if ($is_hidden) {
+                echo "<span class=\"hidden\">$cell</span>";
+                // echo "<input type=\"text\" class=\"edit\" size=\"2\"/>";
+            }
+            else
+                echo $cell;
+            echo "</td>\n";
+            ++$col;
+        }
+        echo " </tr>\n";
+        ++$row;
+    }
 
 
 ?>
@@ -109,20 +109,20 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 
 <script type="text/javascript">
-	var visible = false;
-	function ShowSolution()
-	{
-		if (visible) {
-			$(".hidden").hide();
-			// $(".edit").show();
-			$("#showhidebutton").text("Show solution");
-		} else {
-			// $(".edit").hide();
-			$(".hidden").show();
-			$("#showhidebutton").text("Hide solution");
-		}
-		visible = !visible;
-	}
+    var visible = false;
+    function ShowSolution()
+    {
+        if (visible) {
+            $(".hidden").hide();
+            // $(".edit").show();
+            $("#showhidebutton").text("Show solution");
+        } else {
+            // $(".edit").hide();
+            $(".hidden").show();
+            $("#showhidebutton").text("Hide solution");
+        }
+        visible = !visible;
+    }
 </script>
 
 <div>
