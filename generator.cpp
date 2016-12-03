@@ -210,10 +210,11 @@ bool Generator::fill(int max_backtrack)
 {
     Solver solve;
     Size size = m_sudoku.size();
-    bool empty = solve.unsolved() == size.area();
+    bool empty;
 
     do {
         solve.set(m_sudoku);
+        empty = solve.unsolved() == size.area();
         if (empty) {
             for (coord f = 0; f < size.line(); f++) {               // fill 1st block
                 if (solve.error())                                  // this should be impossible
