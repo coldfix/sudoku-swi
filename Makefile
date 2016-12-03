@@ -2,7 +2,7 @@
 # Global variables:
 #
 
-BIN = sudoku.elf
+BIN = sudoku
 OBJ = main.o solver.o generator.o
 
 # Need g++-4.5 or newer
