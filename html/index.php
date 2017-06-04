@@ -16,10 +16,12 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     $cols = 3;
     $rows = 3;
 
-    list($c, $r) = explode('x', $_GET['size']);
-    if (is_numeric($c) && is_numeric($r)){
-        $cols = $c;
-        $rows = $r;
+    if (array_key_exists('size', $_GET)) {
+        list($c, $r) = explode('x', $_GET['size']);
+        if (is_numeric($c) && is_numeric($r)){
+            $cols = $c;
+            $rows = $r;
+        }
     }
 
     // $size = $length >= 10 ? 2 : 1;
