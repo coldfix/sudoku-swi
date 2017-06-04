@@ -20,4 +20,4 @@ RUN apk update && \
 EXPOSE 3000
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-CMD ["lighttpd", "-Df", "/sudoku/docker/lighttpd.conf"]
+CMD ["lighttpd", "-Df", "/sudoku/lighttpd.conf"]

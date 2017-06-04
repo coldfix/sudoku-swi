@@ -18,13 +18,9 @@ your own, whether you want to look at such ugliness.
 Installation
 ~~~~~~~~~~~~
 
-Make the ``html/`` folder accessible somewhere in your webroot, enable PHP.
-
-Run ``make`` to build the generator_ and put binary in ``html/sudoku``.
-
 .. _generator: https://github.com/coldfix/sudoku-cli
 
-For example, build:
+Build the generator:
 
 .. code-block:: bash
 
@@ -33,12 +29,13 @@ For example, build:
     apt-get install base-devel boost-dev
     make
 
-And run on http://localhost:3030 with lighttpd:
+Now, serve the ``html/`` folder with CGI enabled. For example, use lighttpd
+to serve on http://localhost:3030:
 
 .. code-block:: bash
 
     apt-get install lighttpd php php-cgi fcgi
-    lighttpd -Df docker/lighttpd.conf
+    lighttpd -Df lighttpd.conf
 
 
 Docker
