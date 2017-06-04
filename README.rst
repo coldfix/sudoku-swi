@@ -23,3 +23,16 @@ Make the ``html/`` folder accessible somewhere in your webroot, enable PHP.
 Run ``make`` to build the generator_ and put binary in ``html/sudoku``.
 
 .. _generator: https://github.com/coldfix/sudoku-cli
+
+
+Docker
+------
+
+You can run the site inside a docker container using lighttpd:
+
+.. code-block:: bash
+
+    git clone https://github.com/coldfix/sudoku-swi
+    cd sudoku-swi
+    docker build . -t sudoku
+    docker run -d --restart=always -p 3000:3000 sudoku
