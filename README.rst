@@ -24,6 +24,22 @@ Run ``make`` to build the generator_ and put binary in ``html/sudoku``.
 
 .. _generator: https://github.com/coldfix/sudoku-cli
 
+For example, build:
+
+.. code-block:: bash
+
+    git clone https://github.com/coldfix/sudoku-swi
+    cd sudoku-swi
+    apt-get install base-devel boost-dev
+    make
+
+And run on http://localhost:3030 with lighttpd:
+
+.. code-block:: bash
+
+    apt-get install lighttpd php php-cgi fcgi
+    lighttpd -Df docker/lighttpd.conf
+
 
 Docker
 ------
