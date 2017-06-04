@@ -20,6 +20,6 @@ Installation
 
 Make the ``html/`` folder accessible somewhere in your webroot, enable PHP.
 
-Build the generator_ and put the ``sudoku`` binary in ``html/``.
+Run ``make`` to build the generator_ and put binary in ``html/sudoku``.
 
 .. _generator: https://github.com/coldfix/sudoku-cli
