@@ -9,7 +9,7 @@ OBJ = main.o solver.o generator.o
 CC = g++
 
 CFLAGS = -Wall -O3 -std=c++11
-LFLAGS = -Wall -O3
+LFLAGS = -Wall -O3 -static
 
 
 # Build targets:

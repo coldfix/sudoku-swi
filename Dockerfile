@@ -6,11 +6,10 @@ WORKDIR /sudoku
 
 # 3.3 has no dumb-init nor tini, so we we have to download the binary manually.
 # For that we need openssl, see: https://github.com/Yelp/dumb-init/issues/73.
-# NOTE: need gcc/g++ runtime libs, so not uninstalling!
-ENV build_deps="make openssl boost-dev"
+ENV build_deps="make openssl gcc g++ boost-dev"
 
 RUN apk update && \
-    apk add -u lighttpd fcgi php php-cgi gcc g++ $build_deps && \
+    apk add -u lighttpd fcgi php php-cgi $build_deps && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 && \
     chmod +x /usr/local/bin/dumb-init && \
     make && \
