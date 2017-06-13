@@ -6,6 +6,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <title>Sudoku</title>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
   <link rel="stylesheet" type="text/css" href="./sudoku.css"/>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
   <script type="text/javascript" src="jquery.js"></script>
 </head>
 <body>
