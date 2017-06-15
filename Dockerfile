@@ -1,22 +1,17 @@
-# Only in 3.3: php php-cgi
-FROM alpine:3.3
+FROM alpine:3.6
 
 COPY . /sudoku
 WORKDIR /sudoku
 
-# 3.3 has no dumb-init nor tini, so we we have to download the binary manually.
-# For that we need openssl, see: https://github.com/Yelp/dumb-init/issues/73.
-ENV build_deps="make openssl gcc g++ boost-dev"
+ARG build_deps="make gcc g++ boost-dev"
 
 RUN apk update && \
-    apk add -u lighttpd fcgi php php-cgi $build_deps && \
-    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 && \
-    chmod +x /usr/local/bin/dumb-init && \
+    apk add -u tini lighttpd fcgi php7 php7-cgi $build_deps && \
     make && \
     apk del $build_deps && \
-    rm -rf generator
+    rm -rf generator /var/cache/apk/*
 
 EXPOSE 3000
 
-ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["lighttpd", "-Df", "/sudoku/lighttpd.conf"]
