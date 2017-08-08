@@ -48,4 +48,4 @@ You can run the site inside a docker container using lighttpd:
     git clone https://github.com/coldfix/sudoku-swi
     cd sudoku-swi
     docker build . -t sudoku
-    docker run -d --restart=always -p 3000:3000 sudoku
+    docker run -d --restart=always -p 3000:3000 --cap-drop=all sudoku
