@@ -1,17 +1,20 @@
-FROM alpine:3.12.0
+FROM alpine:3.12.0 as build
 
-COPY . /sudoku
+RUN apk add --no-cache gcc g++ boost-dev make
+
 WORKDIR /sudoku
+COPY ./generator /sudoku
+RUN make
 
-ARG build_deps="make gcc g++ boost-dev"
+FROM alpine:3.6
+RUN apk add --no-cache tini lighttpd fcgi php7 php7-cgi
+RUN adduser -D -H -h /sudoku -u 9001 sudoku
 
-RUN apk update && \
-    apk add -u tini lighttpd fcgi php7 php7-cgi $build_deps && \
-    make && \
-    apk del $build_deps && \
-    rm -rf generator /var/cache/apk/* && \
-    adduser -D -H -h /sudoku -u 9001 sudoku
+COPY ./html                         /sudoku/html
+COPY --from=build /sudoku/sudoku    /sudoku/html/sudoku
+COPY ./lighttpd.conf                /sudoku/lighttpd.conf
 
+WORKDIR /sudoku
 EXPOSE 3000
 USER sudoku
 
