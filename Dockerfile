@@ -7,7 +7,7 @@ COPY ./generator /sudoku
 RUN make
 
 FROM alpine:3.6
-RUN apk add --no-cache tini lighttpd fcgi php7 php7-cgi
+RUN apk add --no-cache tini lighttpd fcgi php7 php7-cgi php7-json
 RUN adduser -D -H -h /sudoku -u 9001 sudoku
 
 COPY ./html                         /sudoku/html
