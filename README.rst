@@ -18,8 +18,6 @@ your own, whether you want to look at such ugliness.
 Installation
 ~~~~~~~~~~~~
 
-.. _generator: https://github.com/coldfix/sudoku-cli
-
 Build the generator:
 
 .. code-block:: bash
@@ -41,11 +39,16 @@ to serve on http://localhost:3030:
 Docker
 ------
 
-You can run the site inside a docker container using lighttpd:
-
-.. code-block:: bash
+Build a docker image from source that runs the site using lighttpd::
 
     git clone https://github.com/coldfix/sudoku-swi
     cd sudoku-swi
-    docker build . -t sudoku
-    docker run -d --restart=always -p 3000:3000 --cap-drop=all sudoku
+    docker build . -t coldfix/sudoku
+
+Or just pull the latest version from Docker Hub::
+
+    docker pull coldfix/sudoku
+
+And run the site as follows::
+
+    docker run --rm -p 3000:3000 --cap-drop=all coldfix/sudoku
