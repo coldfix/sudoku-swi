@@ -15,14 +15,6 @@ h3 {
     text-align: center;
 }
 
-input.user {
-    text-align: center;
-    background-color: #efefff;
-    border: none;
-}
-#submit {
-}
-
 table.sudoku {
     margin-left: auto;
     margin-right: auto;
@@ -52,12 +44,3 @@ table.sudoku .right { border-right-width: 2px; }
 
 table.sudoku .hidden { color: lime; }
 table.sudoku .hidden { display: none; }
-
-
-table.sudoku td.riddle { color: black; }
-table.sudoku td.user { color: silver; }
-table.sudoku td.solution { color: lime; }
-table.sudoku td.incorrect { color: red; }
-table.sudoku td.invalid { background-color: maroon; color: black; }
-
-

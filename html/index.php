@@ -25,7 +25,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         }
     }
 
-    // $size = $length >= 10 ? 2 : 1;
     $length = $cols * $rows;
     $dim = $cols.'x'.$rows;
 
@@ -75,7 +74,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
             $is_hidden = false;
 
             $col_attr = "";
-            if ($cell != 0) $col_attr .= "r";
             if ($col%$cols == 0 && $col != 0) $col_attr .= " left";
             if (($col+1)%$cols == 0 && $col+1 != $length) $col_attr .= " right";
 
@@ -83,7 +81,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
             if (substr($cell, 0, 1) == "~") {
                 $cell = substr($cell, 1);
                 $is_hidden = true;
-                // $hidden_attr = " hidden";
             }
 
             $attr = trim ($col_attr . $row_attr . $hidden_attr);
@@ -93,7 +90,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
             echo "  <td$attr>";
             if ($is_hidden) {
                 echo "<span class=\"hidden\">$cell</span>";
-                // echo "<input type=\"text\" class=\"edit\" size=\"2\"/>";
             }
             else
                 echo $cell;
@@ -115,10 +111,8 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     {
         if (visible) {
             $(".hidden").hide();
-            // $(".edit").show();
             $("#showhidebutton").text("Show solution");
         } else {
-            // $(".edit").hide();
             $(".hidden").show();
             $("#showhidebutton").text("Hide solution");
         }
