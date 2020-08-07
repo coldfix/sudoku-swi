@@ -1,34 +1,23 @@
-<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="en">
 <head>
-  <title>Sudoku</title>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-  <link rel="stylesheet" type="text/css" href="./sudoku.css"/>
-  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="sudoku.css"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
   <script type="text/javascript" src="sudoku.js"></script>
+  <title>Sudoku</title>
 </head>
 <body onload="initApp()">
- <div id="content">
-
   <h3>Sudoku</h3>
 
   <form onsubmit="return changeSize(this.elements[0].value);">
-   <div>
     Size:
     <select name="size"></select>
     <input type="submit" value="Go!"/>
-   </div>
   </form>
 
-  <table class="sudoku">
-  </table>
+  <table class="sudoku"></table>
 
-  <div>
-   <button id="showhidebutton" onclick="toggleSolution()">Show solution</button>
-  </div>
-
- </div>
+  <button id="showhidebutton" onclick="toggleSolution()">Show solution</button>
 </body>
 </html>
