@@ -52,7 +52,7 @@ function queryTable(size)
 function renderTable(data, rows, cols)
 {
   visible = false;
-  $("#showhidebutton").text("Show solution");
+  document.querySelector("#showhidebutton").innerHTML = "Show solution";
 
   let table = document.createElement('table');
 
@@ -94,12 +94,18 @@ function renderTable(data, rows, cols)
 
 function toggleSolution()
 {
+  var fields = document.querySelectorAll(".hidden");
+  var button = document.querySelector("#showhidebutton");
   if (visible) {
-    $(".hidden").hide();
-    $("#showhidebutton").text("Show solution");
+    for (const node of fields) {
+      node.style.display = 'none';
+    }
+    button.innerHTML = "Show solution";
   } else {
-    $(".hidden").show();
-    $("#showhidebutton").text("Hide solution");
+    for (const node of fields) {
+      node.style.display = 'inline';
+    }
+    button.innerHTML = "Hide solution";
   }
   visible = !visible;
 }
