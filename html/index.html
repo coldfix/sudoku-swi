@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="sudoku.css"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <script type="text/javascript" src="sudoku.js"></script>
+  <title>Sudoku</title>
+</head>
+<body onload="initApp()">
+  <h3>Sudoku</h3>
+
+  <form onsubmit="return changeSize(this.elements[0].value);">
+    Size:
+    <select name="size"></select>
+    <input type="submit" value="Go!"/>
+  </form>
+
+  <table class="sudoku"></table>
+
+  <button id="showhidebutton" onclick="toggleSolution()">Show solution</button>
+</body>
+</html>
