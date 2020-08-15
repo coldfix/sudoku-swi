@@ -1,10 +1,9 @@
 port module Sudoku exposing (..)
 
 import Browser
-import Html exposing (
-    Html, button, div, text, input, option, select, table, tr, td, span)
+import Html exposing (Html)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, value, selected, name, class, classList)
+import Html.Attributes as Attr
 import Array exposing (Array)
 
 
@@ -43,7 +42,7 @@ init boardSize =
         emptyBoard = Board [] "0x0"
         emptyModel = Model emptyBoard boardSize False
     in
-    (emptyModel, fetchBoard boardSize)
+    ( emptyModel, fetchBoard boardSize )
 
 
 -- UPDATE
@@ -86,7 +85,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-  div []
+  Html.div []
     [ viewSizeSelect model
     , viewBoard model
     , viewShowButton model
@@ -105,23 +104,32 @@ viewSizeSelect model =
             |> List.sort
 
         sizeOption v =
-            option [value v, selected (model.selectedSize == v)] [text v]
+            Html.option
+                [ Attr.value v, Attr.selected (model.selectedSize == v) ]
+                [ Html.text v ]
     in
-    div []
-      [ text "Size:"
-      , select [ onInput SelectSize, name "size" ] (List.map sizeOption choices)
-      , input [ onClick RequestBoard, type_ "submit", value "Go!" ] []
-      ]
+    Html.div []
+        [ Html.text "Size:"
+        , Html.select
+            [ onInput SelectSize
+            , Attr.name "size"
+            ] (List.map sizeOption choices)
+        , Html.input
+            [ onClick RequestBoard
+            , Attr.type_ "submit"
+            , Attr.value "Go!"
+            ] []
+        ]
 
 
 viewShowButton : Model -> Html Msg
 viewShowButton model =
     case model.showSolution of
         True ->
-            button [ onClick HideSolution ] [ text "Hide solution" ]
+            Html.button [ onClick HideSolution ] [ Html.text "Hide solution" ]
 
         False ->
-            button [ onClick ShowSolution ] [ text "Show solution" ]
+            Html.button [ onClick ShowSolution ] [ Html.text "Show solution" ]
 
 
 viewBoard : Model -> Html Msg
@@ -139,7 +147,7 @@ viewBoard model =
         n = n0 * n1
 
         cellAttrs i j =
-            [ classList
+            [ Attr.classList
                 [ ("top", i > 0 && modBy n1 i == 0)
                 , ("bottom", i < n && modBy n1 (i+1) == 0)
                 , ("left", j > 0 && modBy n0 j == 0)
@@ -150,9 +158,9 @@ viewBoard model =
         cellTextAttrs s =
             if String.startsWith "~" s then
                 if model.showSolution then
-                    [ class "shown" ]
+                    [ Attr.class "shown" ]
                 else
-                    [ class "hidden" ]
+                    [ Attr.class "hidden" ]
             else
                 []
 
@@ -164,14 +172,20 @@ viewBoard model =
 
         formatCell : Int -> Int -> String -> Html Msg
         formatCell row col s =
-            td (cellAttrs row col)
-                [ span (cellTextAttrs s) [ text (cellText s) ] ]
+            Html.td
+                ( cellAttrs row col )
+                [ Html.span
+                    ( cellTextAttrs s )
+                    [ Html.text (cellText s) ]
+                ]
 
         formatRow : Int -> List String -> Html Msg
         formatRow row items =
-            tr [] (List.indexedMap (formatCell row) items)
+            Html.tr [] ( List.indexedMap (formatCell row) items )
     in
-    table [ class "board" ] (List.indexedMap formatRow model.board.data)
+    Html.table
+        [ Attr.class "board" ]
+        ( List.indexedMap formatRow model.board.data )
 
 
 
