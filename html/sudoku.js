@@ -44,12 +44,12 @@ function queryTable(size)
     .then(response => response.json())
     .then(content => {
       if (content.success) {
-        renderTable(content.data, content.rows, content.cols);
+        renderTable(content.board, content.rows, content.cols);
       }
     });
 }
 
-function renderTable(data, rows, cols)
+function renderTable(board, rows, cols)
 {
   visible = false;
   document.querySelector("#showhidebutton").innerHTML = "Show solution";
@@ -58,7 +58,7 @@ function renderTable(data, rows, cols)
 
   let n = rows * cols - 1;
   let i = 0;
-  for (const row of data) {
+  for (const row of board) {
     let tr = document.createElement("tr");
     let j = 0;
 
@@ -88,7 +88,7 @@ function renderTable(data, rows, cols)
     ++i;
   }
 
-  document.querySelector("table.sudoku").innerHTML = table.innerHTML;
+  document.querySelector("table.board").innerHTML = table.innerHTML;
 }
 
 

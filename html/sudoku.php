@@ -25,7 +25,7 @@ if ($code == 0) {
 
     $response = [
         'success' => true,
-        'data' => $data,
+        'board' => $data,
         'cols' => $cols,
         'rows' => $rows,
     ];
@@ -33,7 +33,9 @@ if ($code == 0) {
 else {
     $response = [
         'success' => false,
-        'data' => null,
+        'board' => null,
+        'cols' => null,
+        'rows' => null,
     ];
 }
 
