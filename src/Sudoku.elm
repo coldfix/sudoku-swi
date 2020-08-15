@@ -11,11 +11,11 @@ import Array exposing (Array)
 
 main : Program BoardSize Model Msg
 main =
-  Browser.element {
-      init = init,
-      update = update,
-      view = view,
-      subscriptions = subscriptions }
+    Browser.element {
+        init = init,
+        update = update,
+        view = view,
+        subscriptions = subscriptions }
 
 
 -- PORTS
@@ -42,54 +42,54 @@ init boardSize =
         emptyBoard = Board [] "0x0"
         emptyModel = Model emptyBoard boardSize False
     in
-    ( emptyModel, fetchBoard boardSize )
+        ( emptyModel, fetchBoard boardSize )
 
 
 -- UPDATE
 
 type Msg
-  = ShowSolution
-  | HideSolution
-  | RecvBoard Board
-  | RecvHash String
-  | RequestBoard
-  | SelectSize String
+    = ShowSolution
+    | HideSolution
+    | RecvBoard Board
+    | RecvHash String
+    | RequestBoard
+    | SelectSize String
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  case msg of
-    ShowSolution ->
-      ({ model | showSolution = True }, Cmd.none)
+    case msg of
+        ShowSolution ->
+            ({ model | showSolution = True }, Cmd.none)
 
-    HideSolution ->
-      ({ model | showSolution = False }, Cmd.none)
+        HideSolution ->
+            ({ model | showSolution = False }, Cmd.none)
 
-    SelectSize size ->
-      ({ model | selectedSize = size }, Cmd.none)
+        SelectSize size ->
+            ({ model | selectedSize = size }, Cmd.none)
 
-    RecvBoard board ->
-      ({ model | board = board, selectedSize = board.size}, Cmd.none)
+        RecvBoard board ->
+            ({ model | board = board, selectedSize = board.size}, Cmd.none)
 
-    RecvHash hash ->
-      let
-          size = String.dropLeft 1 hash
-      in
-      (model, if size == model.board.size then Cmd.none else fetchBoard size)
+        RecvHash hash ->
+            let
+                size = String.dropLeft 1 hash
+            in
+                (model, if size == model.board.size then Cmd.none else fetchBoard size)
 
-    RequestBoard ->
-      (model, fetchBoard model.selectedSize)
+        RequestBoard ->
+            (model, fetchBoard model.selectedSize)
 
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-  Html.div []
-    [ viewSizeSelect model
-    , viewBoard model
-    , viewShowButton model
-    ]
+    Html.div []
+        [ viewSizeSelect model
+        , viewBoard model
+        , viewShowButton model
+        ]
 
 viewSizeSelect : Model -> Html Msg
 viewSizeSelect model =
@@ -108,18 +108,18 @@ viewSizeSelect model =
                 [ Attr.value v, Attr.selected (model.selectedSize == v) ]
                 [ Html.text v ]
     in
-    Html.div []
-        [ Html.text "Size:"
-        , Html.select
-            [ onInput SelectSize
-            , Attr.name "size"
-            ] (List.map sizeOption choices)
-        , Html.input
-            [ onClick RequestBoard
-            , Attr.type_ "submit"
-            , Attr.value "Go!"
-            ] []
-        ]
+        Html.div []
+            [ Html.text "Size:"
+            , Html.select
+                [ onInput SelectSize
+                , Attr.name "size"
+                ] (List.map sizeOption choices)
+            , Html.input
+                [ onClick RequestBoard
+                , Attr.type_ "submit"
+                , Attr.value "Go!"
+                ] []
+            ]
 
 
 viewShowButton : Model -> Html Msg
@@ -183,11 +183,9 @@ viewBoard model =
         formatRow row items =
             Html.tr [] ( List.indexedMap (formatCell row) items )
     in
-    Html.table
-        [ Attr.class "board" ]
-        ( List.indexedMap formatRow model.board.data )
-
-
+        Html.table
+            [ Attr.class "board" ]
+            ( List.indexedMap formatRow model.board.data )
 
 
 -- Subscriptions
