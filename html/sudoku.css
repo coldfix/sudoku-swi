@@ -38,5 +38,5 @@ table.board .bottom { border-bottom-width: 2px; }
 table.board .left { border-left-width: 2px; }
 table.board .right { border-right-width: 2px; }
 
-table.board .hidden { color: lime; }
-table.board .hidden { display: none; }
+table.board .shown { color: lime; }
+table.board .hidden { visibility: hidden; }

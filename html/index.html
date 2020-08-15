@@ -7,17 +7,36 @@
   <script type="text/javascript" src="sudoku.js"></script>
   <title>Sudoku</title>
 </head>
-<body onload="initApp()">
+<body>
   <h3>Sudoku</h3>
 
-  <form onsubmit="return changeSize(this.elements[0].value);">
-    Size:
-    <select name="size"></select>
-    <input type="submit" value="Go!"/>
-  </form>
+  <div id="sudoku"></div>
+  <script type="text/javascript">
+    var app = Elm.Sudoku.init({
+      node: document.getElementById('sudoku'),
+      flags: window.location.hash.slice(1) || "3x3",
+    });
 
-  <table class="board"></table>
+    function fetchBoard(size)
+    {
+      fetch(`sudoku.php?size=${size}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            app.ports.recvBoard.send({
+              "data": data.board,
+              "size": data.size,
+            });
+            window.location.hash = data.size;
+          }
+        });
+    };
 
-  <button id="showhidebutton" onclick="toggleSolution()">Show solution</button>
+    window.addEventListener("hashchange", function() {
+      app.ports.recvHash.send(window.location.hash);
+    }, false)
+
+    app.ports.fetchBoard.subscribe(fetchBoard);
+  </script>
 </body>
 </html>

@@ -3,3 +3,6 @@
 *.o
 README*
 COPYING*
+elm-stuff
+node_modules
+package-lock.json

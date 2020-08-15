@@ -26,16 +26,14 @@ if ($code == 0) {
     $response = [
         'success' => true,
         'board' => $data,
-        'cols' => $cols,
-        'rows' => $rows,
+        'size' => $dim,
     ];
 }
 else {
     $response = [
         'success' => false,
         'board' => null,
-        'cols' => null,
-        'rows' => null,
+        'size' => null,
     ];
 }
 
