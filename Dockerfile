@@ -1,4 +1,4 @@
-FROM alpine:3.12.3 as build
+FROM alpine:3.14.2 as build
 
 RUN apk add --no-cache gcc g++ boost-dev make
 
@@ -6,7 +6,7 @@ WORKDIR /sudoku
 COPY ./generator /sudoku
 RUN make
 
-FROM alpine:3.12.3
+FROM alpine:3.14.2
 RUN apk add --no-cache tini lighttpd fcgi php7 php7-cgi php7-json
 RUN adduser -D -H -h /sudoku -u 9001 sudoku
 
