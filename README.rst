@@ -48,4 +48,4 @@ Or just pull the latest version from Docker Hub::
 
 And run the site as follows::
 
-    docker run --rm -p 3000:3000 --cap-drop=all coldfix/sudoku
+    docker run --rm --init -p 3000:3000 --cap-drop=all coldfix/sudoku

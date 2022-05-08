@@ -7,7 +7,7 @@ COPY ./generator /sudoku
 RUN make
 
 FROM alpine:3.12.3
-RUN apk add --no-cache tini lighttpd fcgi php7 php7-cgi php7-json
+RUN apk add --no-cache lighttpd fcgi php7 php7-cgi php7-json
 RUN adduser -D -H -h /sudoku -u 9001 sudoku
 
 COPY ./html                         /sudoku/html
@@ -18,5 +18,4 @@ WORKDIR /sudoku
 EXPOSE 3000
 USER sudoku
 
-ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["lighttpd", "-Df", "/sudoku/lighttpd.conf"]
