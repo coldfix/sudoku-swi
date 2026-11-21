@@ -14,7 +14,7 @@ Build
 You need
 
 - g++
-- libboost-dev
+- make
 - some luck
 
 On linux, type::

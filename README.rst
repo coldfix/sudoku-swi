@@ -21,7 +21,7 @@ Build the generator:
 
     git clone https://github.com/coldfix/sudoku-swi
     cd sudoku-swi
-    apt-get install base-devel boost-dev
+    apt-get install base-devel
     make
 
 The build places the executable in ``bin/sudoku``, outside the webroot.

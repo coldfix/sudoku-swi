@@ -1,13 +1,13 @@
 #ifndef __SUDOKU_H__INCLUDED__
 #define __SUDOKU_H__INCLUDED__
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 
 namespace sudoku
 {
-    typedef boost::int16_t coord;
-    typedef boost::int8_t value;
+    typedef std::int16_t coord;
+    typedef std::int8_t value;
 
     enum class Difficulty { Easy, Medium, Hard };
 
