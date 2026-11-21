@@ -13,7 +13,7 @@ RUN apk upgrade --no-cache && \
 RUN adduser -D -H -h /sudoku -u 9001 sudoku
 
 COPY ./html                         /sudoku/html
-COPY --from=build /sudoku/sudoku    /sudoku/html/sudoku
+COPY --from=build /sudoku/sudoku    /sudoku/bin/sudoku
 COPY ./lighttpd.conf                /sudoku/lighttpd.conf
 
 WORKDIR /sudoku

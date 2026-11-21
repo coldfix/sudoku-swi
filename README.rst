@@ -24,7 +24,12 @@ Build the generator:
     apt-get install base-devel boost-dev
     make
 
-Now, serve the ``html/`` folder with CGI enabled. For example, use lighttpd
+The build places the executable in ``bin/sudoku``, outside the webroot.
+Keep ``bin/`` alongside ``html/`` when deploying, and remove any legacy
+``html/sudoku`` executable. The web-server user needs execute permission on
+the binary, but should not have write permission on it or ``bin/``.
+
+Now, serve only the ``html/`` folder with CGI enabled. For example, use lighttpd
 to serve on http://localhost:3030:
 
 .. code-block:: bash

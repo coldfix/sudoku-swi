@@ -29,7 +29,7 @@ $dim = $cols.'x'.$rows;
 
 // An argument array bypasses the shell; resolve the executable independently
 // of the web server's working directory.
-$process = proc_open([__DIR__.'/sudoku', $dim, '--solution'], [
+$process = proc_open([dirname(__DIR__).'/bin/sudoku', $dim, '--solution'], [
     0 => ['file', '/dev/null', 'r'],
     1 => ['pipe', 'w'],
     2 => ['file', '/dev/null', 'w'],

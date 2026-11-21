@@ -1,9 +1,10 @@
-all: html/sudoku
+all: bin/sudoku
 
-html/sudoku: generator/sudoku
+bin/sudoku: generator/sudoku
+	mkdir -p bin
 	cp $< $@
 
 generator/sudoku:
-	cd generator && $(MAKE)
+	$(MAKE) -C generator
 
 .PHONY: generator/sudoku
