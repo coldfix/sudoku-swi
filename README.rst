@@ -32,6 +32,9 @@ to serve on http://localhost:3030:
     apt-get install lighttpd php php-cgi fcgi
     lighttpd -Df lighttpd.conf
 
+Web requests accept positive integer block dimensions whose product is at
+most 25 (for example, ``5x5``, ``6x4``, or ``7x3``).
+
 
 Docker
 ------

@@ -30,7 +30,7 @@ function renderSizeChoices(selected)
   for (const option of options) {
     let option_node = document.createElement("option");
     option_node.selected = option === selected;
-    option_node.innerHTML = option;
+    option_node.textContent = option;
     select_node.add(option_node);
   }
 }
@@ -40,19 +40,20 @@ function queryTable(size)
   if (size === undefined) {
     size = "3x3";
   }
-  fetch(`sudoku.php?size=${size}`)
+  fetch(`sudoku.php?size=${encodeURIComponent(size)}`)
     .then(response => response.json())
     .then(content => {
       if (content.success) {
         renderTable(content.data, content.rows, content.cols);
       }
-    });
+    })
+    .catch(() => {});
 }
 
 function renderTable(data, rows, cols)
 {
   visible = false;
-  document.querySelector("#showhidebutton").innerHTML = "Show solution";
+  document.querySelector("#showhidebutton").textContent = "Show solution";
 
   let table = document.createElement('table');
 
@@ -73,11 +74,11 @@ function renderTable(data, rows, cols)
       if (cell.startsWith('~')) {
         let span = document.createElement('span');
         span.className = 'hidden';
-        span.innerHTML = cell.substr(1);
+        span.textContent = cell.substr(1);
         td.appendChild(span);
       }
       else {
-        td.innerHTML = cell;
+        td.textContent = cell;
       }
 
       tr.appendChild(td);
@@ -88,7 +89,7 @@ function renderTable(data, rows, cols)
     ++i;
   }
 
-  document.querySelector("table.sudoku").innerHTML = table.innerHTML;
+  document.querySelector("table.sudoku").replaceChildren(...table.childNodes);
 }
 
 
@@ -100,12 +101,12 @@ function toggleSolution()
     for (const node of fields) {
       node.style.display = 'none';
     }
-    button.innerHTML = "Show solution";
+    button.textContent = "Show solution";
   } else {
     for (const node of fields) {
       node.style.display = 'inline';
     }
-    button.innerHTML = "Hide solution";
+    button.textContent = "Hide solution";
   }
   visible = !visible;
 }
